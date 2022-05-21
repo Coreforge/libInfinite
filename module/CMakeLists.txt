@@ -1,0 +1,1 @@
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Module.cpp ${CMAKE_CURRENT_LIST_DIR}/ModuleItem.cpp )
