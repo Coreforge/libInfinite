@@ -25,6 +25,11 @@ int Module::loadModule(FILE* file, const char* name){
 		return -1;
 	}
 
+	if(memcmp(header,"mohd",4)){
+		// magic doesn't match, don't load
+		return -1;
+	}
+
 	//for(int i = 0; i < 0x40; i++) printf("%02hhx ",*(header+i));
 
 	fileCount = *(uint32_t*)(header+0x10);	// offset 0x10 from start
@@ -90,6 +95,10 @@ int Module::loadModule(FILE* file, const char* name){
 		size_t len = strnlen(strings + item->stringOffset, stringsSize - item->stringOffset);
 		item->path = std::string(strings + item->stringOffset, len);
 		std::replace(item->path.begin(), item->path.end(), '\\', '/');
+
+		// replace characters in file names that could cause issues
+		std::replace(item->path.begin(), item->path.end(), ' ', '_');
+		std::replace(item->path.begin(), item->path.end(), ':', '_');
 		//printf("%s\n",strings + item->stringOffset);
 
 		//finally add the item to the list of items
