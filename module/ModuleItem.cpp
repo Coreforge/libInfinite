@@ -19,12 +19,12 @@ unsigned char* ModuleItem::extractData(){
 		for(int b = firstBlockIndex; b < blockCount + firstBlockIndex; b++){
 			if(!module->blockTable.blocks[b]->isCompressed){
 				// not compressed, read straight into output buffer
-				fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
+				fseek(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
 				fread((void*)data,1,module->blockTable.blocks[b]->compressedSize,handle);
 			} else {
 				// block is compressed, so it has to be decompressed first
 				void* block = malloc(module->blockTable.blocks[b]->compressedSize);
-				fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
+				fseek(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
 				fread(block,1,module->blockTable.blocks[b]->compressedSize,handle);
 				decompress(block, module->blockTable.blocks[b]->compressedSize, data + module->blockTable.blocks[b]->decompressedOffset, module->blockTable.blocks[b]->decompressedSize);
 				free(block);
@@ -33,7 +33,7 @@ unsigned char* ModuleItem::extractData(){
 	} else {
 		// one implied block
 		void* block = malloc(compressedSize);
-		fseeko64(handle,offset,0);
+		fseek(handle,offset,0);
 		fread(block,1,compressedSize,handle);
 		decompress(block, compressedSize, data, decompressedSize);
 		free(block);

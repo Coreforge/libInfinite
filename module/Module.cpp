@@ -18,7 +18,7 @@ int Module::loadModule(FILE* file, const char* name){
 	this->name.assign(name);
 	unsigned char* header = (unsigned char*)malloc(0x40);
 
-	fseeko64(file,0x0,0);
+	fseek(file,0x0,0);
 	int s = fread(header,1,0x40,file);
 	if(s != 0x40){
 		printf("Could not read header for module %s!\nRead failed after 0x%x bytes (offset 0x%x)\n",path.c_str(),s,s);
@@ -46,7 +46,7 @@ int Module::loadModule(FILE* file, const char* name){
 
 	// if we have an hd1_delta that isn't 0, we should try to open the _hd1 file. If we can't, some files will be inaccessible
 	if(hd1_delta != 0){
-		hd1Handle = fopen64((path + "_hd1").c_str(),"r");
+		hd1Handle = fopen((path + "_hd1").c_str(),"rb");
 		if(!hd1Handle){
 			printf("Missing _hd1 file for module %s\n",path.c_str());
 		}else{
@@ -62,7 +62,7 @@ int Module::loadModule(FILE* file, const char* name){
 
 	// aligned to 0x1000 bytes
 	uint64_t tmp = blockTableOffset + blockCount*0x14;
-	if(tmp & 0xfff == 0){
+	if((tmp & 0xfff) == 0){
 		dataOffset = tmp;
 	} else {
 		dataOffset = (tmp & 0xfffffffffffff000) + 0x1000;
@@ -70,15 +70,28 @@ int Module::loadModule(FILE* file, const char* name){
 
 	// read all of the strings
 	char* strings = (char*)malloc(stringsSize);
-	fseeko64(file,stringOffset,0);
+	fseek(file,stringOffset,0);
 	fread(strings,1,stringsSize,file);
 	//printf("read strings\n");
 	// now that all of the offsets and counts are read, read the item information
-	for(int f = 0; f < fileCount; f++){
+	for(unsigned int f = 0; f < fileCount; f++){
 		unsigned char* itm = (unsigned char*)malloc(0x58);
+		int retry = 0;
+		retry:
 		uint64_t offset = 0x48 + f * 0x58;
-		fseeko64(file,offset,0);
-		fread(itm,1,0x58,file);
+		fseek(file,offset,SEEK_SET);
+		int r = fread(itm,1,0x58,file);
+		if(r != 0x58){
+			retry++;
+			printf("Did not read 0x58 bytes (instead 0x%x, stream at offset 0x%x) errno = %d Try %d\n",r,ftell(file));
+			if(retry < 3){
+				//goto retry;
+			} else {
+				printf("Tried reading item 3 times, skipping! (something isn't right. This shouldn't happen. It really shouldn't)\n");
+				free(itm);
+				continue;
+			}
+		}
 
 		// this needs to be deleted again when this module is unloaded/discarded
 		ModuleItem* item = new ModuleItem();
@@ -90,7 +103,7 @@ int Module::loadModule(FILE* file, const char* name){
 		item->stringOffset = *(uint32_t*)(itm + 0x40);
 		item->module = this;
 
-		//printf("Reading string length from 0x%x with a maximum of 0x%x bytes (0x%x bytes total)\n",item->stringOffset,stringsSize - item->stringOffset, stringsSize);
+		//printf("Reading string length from 0x%x with a maximum of 0x%x bytes (0x%x bytes total) (file offset 0x%lx)\n",item->stringOffset,stringsSize - item->stringOffset, stringsSize,offset);
 		// get the path of the item
 		size_t len = strnlen(strings + item->stringOffset, stringsSize - item->stringOffset);
 		item->path = std::string(strings + item->stringOffset, len);
@@ -108,10 +121,10 @@ int Module::loadModule(FILE* file, const char* name){
 
 	//printf("loaded strings");
 	// read the information for all blocks
-	for(int b = 0; b < blockCount; b++){
+	for(unsigned int b = 0; b < blockCount; b++){
 		uint64_t offset = blockTableOffset + b * 0x14;
 		char* block = (char*)malloc(0x14);
-		fseeko64(file,offset,0);
+		fseek(file,offset,0);
 		fread(block,1,0x14,file);
 		ModuleBlock* blockptr = new ModuleBlock();
 		//memcpy(blockptr,block,0x10);	// just copy over the first 4 values, the layout is the same, and there are no gaps
@@ -133,7 +146,7 @@ int Module::loadModule(FILE* file, const char* name){
 }
 
 int Module::loadModule(const char* path){
-	FILE* file = fopen64(path,"r");
+	FILE* file = fopen(path,"rb");
 	this->path.assign(path);
 	std::string name = std::string(path);
 	std::replace(name.begin(), name.end(), '\\', '/');
