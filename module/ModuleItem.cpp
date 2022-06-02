@@ -13,14 +13,13 @@ unsigned char* ModuleItem::extractData(){
 		offset -= module->hd1_delta;
 		handle = module->hd1Handle;
 	}
-
 	if(blockCount != 0){
 		// there are multiple blocks
 		for(int b = firstBlockIndex; b < blockCount + firstBlockIndex; b++){
 			if(!module->blockTable.blocks[b]->isCompressed){
 				// not compressed, read straight into output buffer
 				fseek(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
-				fread((void*)data,1,module->blockTable.blocks[b]->compressedSize,handle);
+				fread((void*)data + module->blockTable.blocks[b]->decompressedOffset,1,module->blockTable.blocks[b]->compressedSize,handle);
 			} else {
 				// block is compressed, so it has to be decompressed first
 				void* block = malloc(module->blockTable.blocks[b]->compressedSize);
