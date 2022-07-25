@@ -1,11 +1,19 @@
-#include <stdint.h>
-#include "DataTableEntry.h"
+#pragma once
 
-typedef struct typeHash{uint64_t hash[2];} BlockTypeHash;
+#include <stdint.h>
+
+
+typedef struct typeGUID{uint64_t data[2];} GUID;
 
 class ContentTableEntry{
-	uint64_t offset;
-	BlockTypeHash hash;
-	DataTableEntry* ref;
-	DataTableEntry* parent;
+public:
+	GUID type;
+	uint32_t ref;
+	uint32_t parent;
+
+	ContentTableEntry(GUID type, uint32_t ref, uint32_t parent){
+		this->type = type;
+		this->ref = ref;
+		this->parent = parent;
+	};
 };

@@ -20,7 +20,7 @@ message(STATUS "Using oodle from ${OODLE_LIBRARY}")
 
 set_property(TARGET Infinite PROPERTY CXX_STANDARD 17)
 
-target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataTable.cpp ${CMAKE_CURRENT_LIST_DIR}/ContentTable.cpp ${CMAKE_CURRENT_LIST_DIR}/StringTable.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataTable.cpp ${CMAKE_CURRENT_LIST_DIR}/ContentTable.cpp ${CMAKE_CURRENT_LIST_DIR}/StringTable.cpp ${CMAKE_CURRENT_LIST_DIR}/Item.cpp ${CMAKE_CURRENT_LIST_DIR}/Header.cpp)
 
 include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)
 

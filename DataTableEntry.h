@@ -1,9 +1,17 @@
+#pragma once
 #include <stdint.h>
 
 
 
 class DataTableEntry{
-	uint64_t offset;
-	uint64_t size;
+public:
+	uint32_t size;
+	uint16_t region;
+	uint32_t offset;
 
+	DataTableEntry(uint32_t size, uint16_t region, uint32_t offset){
+		this->size = size;
+		this->region = region;
+		this->offset = offset;
+	};
 };

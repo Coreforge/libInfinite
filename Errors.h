@@ -1,0 +1,2 @@
+#define ERROR_NONE 0
+#define ERROR_INVALID_HEADER 1
