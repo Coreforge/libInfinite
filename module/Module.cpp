@@ -21,7 +21,7 @@ int Module::loadModule(FILE* file, const char* name){
 	fseek(file,0x0,0);
 	int s = fread(header,1,0x40,file);
 	if(s != 0x40){
-		printf("Could not read header for module %s!\nRead failed after 0x%x bytes (offset 0x%x)\n",path.c_str(),s,s);
+		logger->log(LOG_LEVEL_ERROR,"Could not read header for module %s!\nRead failed after 0x%x bytes (offset 0x%x)\n",path.c_str(),s,s);
 		return -1;
 	}
 
@@ -41,16 +41,16 @@ int Module::loadModule(FILE* file, const char* name){
 	//printf("Strings size: 0x%x\n",stringsSize);
 	//printf("freeing header\n");
 	free(header);	// the header isn't needed anymore, as all of the data has been copied
-	printf("File count: 0x%x\n",fileCount);
-	printf("Strings size: 0x%x\n",stringsSize);
+	//logger->log(LOG_LEVEL_DEBUG,"File count: 0x%x\n",fileCount);
+	//logger->log(LOG_LEVEL_DEBUG,"Strings size: 0x%x\n",stringsSize);
 
 	// if we have an hd1_delta that isn't 0, we should try to open the _hd1 file. If we can't, some files will be inaccessible
 	if(hd1_delta != 0){
 		hd1Handle = fopen((path + "_hd1").c_str(),"rb");
 		if(!hd1Handle){
-			printf("Missing _hd1 file for module %s\n",path.c_str());
+			logger->log(LOG_LEVEL_WARNING,"Missing _hd1 file for module %s\n",path.c_str());
 		}else{
-			printf("Found _hd1 file for module %s\n",path.c_str());
+			logger->log(LOG_LEVEL_INFO,"Found _hd1 file for module %s\n",path.c_str());
 		}
 	}
 
@@ -81,13 +81,14 @@ int Module::loadModule(FILE* file, const char* name){
 		uint64_t offset = 0x48 + f * 0x58;
 		fseek(file,offset,SEEK_SET);
 		int r = fread(itm,1,0x58,file);
+		// this retry stuff isn't needed anymore. This issue happened on windows due to opening the files in text mode
 		if(r != 0x58){
 			retry++;
-			printf("Did not read 0x58 bytes (instead 0x%x, stream at offset 0x%x) errno = %d Try %d\n",r,ftell(file));
+			logger->log(LOG_LEVEL_WARNING,"Did not read 0x58 bytes (instead 0x%x, stream at offset 0x%x) errno = %d Try %d\n",r,ftell(file));
 			if(retry < 3){
 				//goto retry;
 			} else {
-				printf("Tried reading item 3 times, skipping! (something isn't right. This shouldn't happen. It really shouldn't)\n");
+				logger->log(LOG_LEVEL_ERROR,"Tried reading item 3 times, skipping! (something isn't right. This shouldn't happen. It really shouldn't)\n");
 				free(itm);
 				continue;
 			}
