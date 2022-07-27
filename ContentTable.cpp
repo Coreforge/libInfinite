@@ -17,7 +17,7 @@ int ContentTable::readTable(uint8_t* data, uint32_t n){
 
 	for(int i = 0; i < n; i++){
 		uint32_t entryOffset = i * 0x20;
-		GUID type;
+		TypeGUID type;
 		type.data[0] = *((uint64_t*)(data+entryOffset));
 		type.data[1] = *((uint64_t*)(data+entryOffset+0x08));
 		uint32_t ref = *((uint32_t*)(data + entryOffset + 0x14));
