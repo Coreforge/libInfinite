@@ -2,13 +2,24 @@
 #include <stdint.h>
 #include "Module.h"
 #include "oodle.h"
+#include <cstring>
 
 unsigned char* ModuleItem::extractData(){
 	unsigned char* data = (unsigned char*)malloc(decompressedSize);
 	uint64_t offset = dataOffset;
 	FILE* handle = module->fileHandle;
 	// this assumes that a single item is either is the base module or the _hd1 and never split across the two files
+	if(dataOffset > module->data_size){
+		module->logger->log(LOG_LEVEL_ERROR,"Error: Data for %s is beyond the end of the module\n",path.c_str());
+		free(data);
+		return nullptr;
+	}
 	if(dataOffset > module->hd1_delta && module->hd1Handle){
+		if(!module->hd1Handle){
+			module->logger->log(LOG_LEVEL_ERROR, "Error extracting %s, no hd1 file for module %s\n",path.c_str(),module->path.c_str());
+			free(data);
+			return nullptr;
+		}
 		// item is in the _hd1 file and we have a valid hd1 file handle
 		offset -= module->hd1_delta;
 		handle = module->hd1Handle;
@@ -34,7 +45,11 @@ unsigned char* ModuleItem::extractData(){
 		void* block = malloc(compressedSize);
 		fseek(handle,offset,0);
 		fread(block,1,compressedSize,handle);
-		decompress(block, compressedSize, data, decompressedSize);
+		if(compressedSize == decompressedSize){
+			memcpy(data,block,decompressedSize);
+		} else {
+			decompress(block, compressedSize, data, decompressedSize);
+		}
 		free(block);
 	}
 	return data;

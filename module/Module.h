@@ -32,6 +32,7 @@ public:
 	uint32_t table3Count; // at 0x28
 	uint32_t blockCount;  // at 0x2c
 	uint64_t hd1_delta;	  // at 0x38
+	uint32_t data_size;	  // at 0x40
 	uint64_t blockTableOffset;
 	uint64_t dataOffset;
 

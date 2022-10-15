@@ -16,11 +16,11 @@ int Module::loadModule(FILE* file, const char* name){
 
 
 	this->name.assign(name);
-	unsigned char* header = (unsigned char*)malloc(0x40);
+	unsigned char* header = (unsigned char*)malloc(0x50);
 
 	fseek(file,0x0,0);
-	int s = fread(header,1,0x40,file);
-	if(s != 0x40){
+	int s = fread(header,1,0x50,file);
+	if(s != 0x50){
 		logger->log(LOG_LEVEL_ERROR,"Could not read header for module %s!\nRead failed after 0x%x bytes (offset 0x%x)\n",path.c_str(),s,s);
 		return -1;
 	}
@@ -37,6 +37,7 @@ int Module::loadModule(FILE* file, const char* name){
 	table3Count = *(uint32_t*)(header + 0x28);
 	blockCount = *(uint32_t*)(header + 0x2c);
 	hd1_delta = *(uint64_t*)(header + 0x38);
+	data_size = *(uint32_t*)(header + 0x40);
 	//printf("File count: 0x%x\n",fileCount);
 	//printf("Strings size: 0x%x\n",stringsSize);
 	//printf("freeing header\n");
