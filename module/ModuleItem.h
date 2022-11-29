@@ -12,12 +12,17 @@ class ModuleItem{
 public:
 	uint64_t offset;
 	uint64_t dataOffset;
+	uint16_t flags;
 	uint16_t blockCount;
 	uint32_t firstBlockIndex;
 	uint32_t compressedSize;
 	uint32_t decompressedSize;
 	uint32_t stringOffset;
 	std::string path;
+
+	// debugging/research stuff, not needed for normal operation
+	uint32_t idx;
+
 
 	Module* module;
 

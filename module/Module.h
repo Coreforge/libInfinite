@@ -27,6 +27,7 @@ public:
 	std::string path;
 	std::string name;
 
+	uint32_t version;	// at 0x04
 	uint32_t fileCount; // at 0x10
 	uint32_t stringsSize; // at 0x24
 	uint32_t table3Count; // at 0x28

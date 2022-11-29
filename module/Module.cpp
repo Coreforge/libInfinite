@@ -32,12 +32,17 @@ int Module::loadModule(FILE* file, const char* name){
 
 	//for(int i = 0; i < 0x40; i++) printf("%02hhx ",*(header+i));
 
+	version = *(uint32_t*)(header + 0x04);
 	fileCount = *(uint32_t*)(header+0x10);	// offset 0x10 from start
 	stringsSize = *(uint32_t*)(header + 0x24);
 	table3Count = *(uint32_t*)(header + 0x28);
 	blockCount = *(uint32_t*)(header + 0x2c);
 	hd1_delta = *(uint64_t*)(header + 0x38);
 	data_size = *(uint32_t*)(header + 0x40);
+	if(version >= 0x34){
+		data_size = -1;	// looks like this field doesn't exist anymore in this version, setting it to the highest value should avoid any issues in code
+						// using it to filter out files that are listed but that have no data in previous versions (mostly debug files)
+	}
 	//printf("File count: 0x%x\n",fileCount);
 	//printf("Strings size: 0x%x\n",stringsSize);
 	//printf("freeing header\n");
@@ -97,13 +102,18 @@ int Module::loadModule(FILE* file, const char* name){
 
 		// this needs to be deleted again when this module is unloaded/discarded
 		ModuleItem* item = new ModuleItem();
+		item->offset = offset;
 		item->blockCount = *((uint16_t*)(itm + 0xa));
 		item->firstBlockIndex = *(uint32_t*)(itm + 0xc);
-		item->dataOffset = (*((uint64_t*)(itm + 0x18)) & 0xffffffffffff) + dataOffset;	// only six bytes
+		item->dataOffset = (*((uint64_t*)(itm + 0x18)) & 0xffffffffffff) ;//+ dataOffset;	// only six bytes
+		item->flags = *(uint16_t*)(itm + 0x1e);
 		item->compressedSize = *(uint32_t*)(itm + 0x20);
 		item->decompressedSize = *(uint32_t*)(itm + 0x24);
 		item->stringOffset = *(uint32_t*)(itm + 0x40);
 		item->module = this;
+
+
+		item->idx = f;
 
 		//printf("Reading string length from 0x%x with a maximum of 0x%x bytes (0x%x bytes total) (file offset 0x%lx)\n",item->stringOffset,stringsSize - item->stringOffset, stringsSize,offset);
 		// get the path of the item
@@ -130,6 +140,7 @@ int Module::loadModule(FILE* file, const char* name){
 		fread(block,1,0x14,file);
 		ModuleBlock* blockptr = new ModuleBlock();
 		//memcpy(blockptr,block,0x10);	// just copy over the first 4 values, the layout is the same, and there are no gaps
+		blockptr->offset = offset;
 		blockptr->compressedOffset = *(uint32_t*)(block);
 		blockptr->compressedSize = *(uint32_t*)(block + 0x4);
 		blockptr->decompressedOffset = *(uint32_t*)(block + 0x8);
