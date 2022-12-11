@@ -60,6 +60,8 @@ Item::Item(uint8_t* data, uint32_t length, Logger* logger, std::string name, std
 			logger->log(LOG_LEVEL_DEBUG,"%s\n",stringTable.invalidStrings[i].string.c_str());
 		}
 	}
+
+	r = tagRefTable.readTable(data + header.tagRefTableOffset, header.tagRefTableCount,(char*) data + header.stringDataOffset);
 }
 
 void* Item::getDataBlock(DataTableEntry* entry){

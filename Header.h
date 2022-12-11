@@ -4,14 +4,14 @@
 #include <stdint.h>
 
 
-#include "TagTable.h"
+#include "TagRefTable.h"
 
 class Header{
 
 public:
 	// all of these values are also present in the respective table classes, but since the header contains them, they are also present here
-	uint32_t tagTableOffset;
-	uint32_t tagTableCount;
+	uint32_t tagRefTableOffset;
+	uint32_t tagRefTableCount;
 
 	uint32_t dataTableOffset;
 	uint32_t dataTableCount;

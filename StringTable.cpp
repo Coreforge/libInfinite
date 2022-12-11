@@ -29,11 +29,11 @@ int StringTable::readStrings(uint8_t* data, uint32_t count, uint32_t length, uin
 
 		if(index < count){
 			// valid index
-			strings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index));
+			strings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index,offset));
 		} else {
 			// invalid index
 			// probably not used, but might be interesting
-			invalidStrings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index));
+			invalidStrings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index, offset));
 		}
 	}
 	return ERROR_NONE;

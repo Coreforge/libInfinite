@@ -4,6 +4,7 @@
 #include "DataTable.h"
 #include "ContentTable.h"
 #include "StringTable.h"
+#include "TagRefTable.h"
 #include "logger/logger.h"
 
 #include <string>
@@ -15,6 +16,7 @@ public:
 	DataTable dataTable;
 	ContentTable contentTable;
 	StringTable stringTable;
+	TagRefTable tagRefTable;
 	Logger* logger;
 
 	std::string name;

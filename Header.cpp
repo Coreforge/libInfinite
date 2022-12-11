@@ -30,10 +30,10 @@ int Header::parseHeader(uint8_t* data){
 	}
 	// header matches so hopefully the file is ok
 
-	tagTableOffset = 0x50;	// always after the header
-	tagTableCount = *((uint32_t*) (data + 0x18));
+	tagRefTableOffset = 0x50;	// always after the header
+	tagRefTableCount = *((uint32_t*) (data + 0x18));
 
-	dataTableOffset = tagTableOffset + tagTableCount * 0x18;
+	dataTableOffset = tagRefTableOffset + tagRefTableCount * 0x18;
 	dataTableCount = *((uint32_t*) (data + 0x1c));
 
 	contentTableOffset = dataTableOffset + dataTableCount * 0x10;
