@@ -4,7 +4,18 @@
 // excludes files from the file list if their data isn't actually present in the modules
 #define IGNORE_BROKEN_FILES 1
 
+ModuleManager::ModuleManager(Logger* logger){
+	rootNode = new ModuleNode();
+	rootNode->path = "";
+	rootNode->name = "/";
+	rootNode->parent = rootNode;	// the roots parent is the root
+	rootNode->type = NODE_TYPE_DIRECTORY;
+	this->logger = logger;
+}
+
 void ModuleManager::buildNodeTree(){
+	// exclusive lock, because we're modifying the tree
+	mutex.lock();
 	rootNode = new ModuleNode();
 	rootNode->path = "";
 	rootNode->name = "/";
@@ -44,10 +55,13 @@ void ModuleManager::buildNodeTree(){
 			currentParent->item = value;
 		}
 	}
+	mutex.unlock();
 }
 
 void ModuleManager::deleteNodeTree(){
+	mutex.lock();
 	deleteTreeRecursive(rootNode);
+	mutex.unlock();
 }
 
 void ModuleManager::deleteTreeRecursive(ModuleNode* node){
@@ -82,6 +96,24 @@ std::pair<uint64_t,uint64_t> ModuleManager::getSizes(ModuleNode* node){
 		}
 	}
 	return {uncompressed, compressed};
+}
+
+ModuleNode* ModuleManager::getNode(std::string path){
+	std::stringstream stream(path);
+	std::string part;
+	ModuleNode* currentParent = rootNode;
+	while(std::getline(stream,part,'/')){
+		if(part == ""){
+			// empty part. Could be two slashes, could be the root node as "/"
+			continue;
+		}
+		if(currentParent->children.count(part) == 0){
+			// doesn't exist
+			return nullptr;
+		}
+		currentParent = currentParent->children[part];
+	}
+	return currentParent;
 }
 
 int ModuleManager::addModule(Module* module){

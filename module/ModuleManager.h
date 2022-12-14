@@ -7,18 +7,24 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <shared_mutex>
 
 class ModuleManager{
 public:
+	ModuleManager(Logger* logger);
+
 	std::vector<Module*> modules;
 	std::pair<uint64_t,uint64_t> getSizes(ModuleNode* node);	// first is uncompressed, second is compressed
 	ModuleNode* rootNode;
 	Logger* logger;
 
+	std::shared_timed_mutex mutex;
+
 	int addModule(Module* module);
 	int addModule(const char* path);
 	void buildNodeTree();
 	void deleteNodeTree();
+	ModuleNode* getNode(std::string path);
 
 private:
 	void deleteTreeRecursive(ModuleNode* node);
