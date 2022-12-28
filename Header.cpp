@@ -11,7 +11,7 @@
  * 0x18		(0x04)	Tag Table Count
  * 0x1c		(0x04)	Data Table Count
  * 0x20		(0x04)	Content Table Count
- * 0x24		(0x04)	Data Block Table Count
+ * 0x24		(0x04)	Data Block Table Count	(data reference)
  * 0x28		(0x04)	String Count
  * 0x2c		(0x04)	String Length
  * 0x30		(0x04)	Length of some field (likely has to do with tags)

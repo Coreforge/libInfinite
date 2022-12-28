@@ -27,6 +27,7 @@ public:
 
 	// returns a pointer to the start of this blocks data. The data does not get copied again, so this pointer is only valid as long as this item exists
 	void* getDataBlock(DataTableEntry* entry);
+	uint32_t getDataBlockOffset(DataTableEntry* entry);
 
 
 private:

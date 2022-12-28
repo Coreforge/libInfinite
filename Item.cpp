@@ -70,3 +70,7 @@ void* Item::getDataBlock(DataTableEntry* entry){
 
 	return data + full_offset;
 }
+
+uint32_t Item::getDataBlockOffset(DataTableEntry* entry){
+	return entry->region == 1 ? header.dataOffset + entry->offset : header.data2Offset + entry->offset;
+}
