@@ -165,3 +165,9 @@ int Module::loadModule(const char* path){
 	std::replace(name.begin(), name.end(), '\\', '/');
 	return loadModule(file, name.substr(name.rfind('/'), name.npos).c_str());
 }
+
+void Module::closeModule(){
+	if(fileHandle){
+		fclose(fileHandle);
+	}
+}

@@ -17,6 +17,7 @@ public:
 	// file needs to be opened with fopen64 due to the size of some modules
 	int loadModule(FILE* file, const char* name);
 	int loadModule(const char* path);
+	void closeModule();
 
 	Logger* logger;
 
@@ -42,4 +43,5 @@ public:
 
 	BlockTable blockTable;
 	std::map<std::string, ModuleItem*> items;
+	std::map<std::string, ModuleItem*>::iterator currentItem;
 };
