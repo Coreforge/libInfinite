@@ -18,10 +18,15 @@ public:
 	uint32_t compressedSize;
 	uint32_t decompressedSize;
 	uint32_t stringOffset;
+	uint32_t parentIndex;
+	uint32_t tagType;
 	std::string path;
+	ModuleItem* parent;
 
 	// debugging/research stuff, not needed for normal operation
 	uint32_t idx;
+
+	std::vector<ModuleItem*> resources;
 
 
 	Module* module;

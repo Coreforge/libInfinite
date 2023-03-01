@@ -80,6 +80,7 @@ int Module::loadModule(FILE* file, const char* name){
 	fread(strings,1,stringsSize,file);
 	//printf("read strings\n");
 	// now that all of the offsets and counts are read, read the item information
+	std::vector<ModuleItem*> tmpVec;
 	for(unsigned int f = 0; f < fileCount; f++){
 		unsigned char* itm = (unsigned char*)malloc(0x58);
 		int retry = 0;
@@ -110,7 +111,17 @@ int Module::loadModule(FILE* file, const char* name){
 		item->compressedSize = *(uint32_t*)(itm + 0x20);
 		item->decompressedSize = *(uint32_t*)(itm + 0x24);
 		item->stringOffset = *(uint32_t*)(itm + 0x40);
+		item->tagType = *(uint32_t*)(itm + 0x14);
+		item->parentIndex = *(uint32_t*)(itm + 0x44);
 		item->module = this;
+
+		if(item->parentIndex != -1 && item->parentIndex < tmpVec.size()){
+			// like the resource to the parent both ways
+			item->parent = tmpVec[item->parentIndex];
+			item->parent->resources.emplace_back(item);
+		} else {
+			item->parent = nullptr;
+		}
 
 
 		item->idx = f;
@@ -128,6 +139,7 @@ int Module::loadModule(FILE* file, const char* name){
 
 		//finally add the item to the list of items
 		items.insert(std::pair<std::string, ModuleItem*>(item->path, item));
+		tmpVec.emplace_back(item);
 		free(itm);
 	}
 

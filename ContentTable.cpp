@@ -25,7 +25,7 @@ int ContentTable::readTable(uint8_t* data, uint32_t n){
 		uint32_t ref = *((uint32_t*)(data + entryOffset + 0x14));
 		uint32_t parent = *((uint32_t*)(data + entryOffset + 0x18));
 		uint32_t field_offset = *((uint32_t*)(data + entryOffset + 0x1c));
-		entries.emplace_back(ContentTableEntry(type,type_id,ref,parent,field_offset));
+		entries.emplace_back(ContentTableEntry(type,type_id,ref,parent,field_offset,i));
 	}
 	return ERROR_NONE;
 }

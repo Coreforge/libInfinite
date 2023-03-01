@@ -35,6 +35,10 @@ public:
 	uint32_t data2Offset;
 	uint32_t data2Length;
 
+	// even more data (single level textures use this)
+	uint32_t data3Offset;
+	uint32_t data3Length;
+
 	// this function expects the data to be at least 0x50 bytes long (anything beyond 0x50 is ignored)
 	int parseHeader(uint8_t* data);
 };

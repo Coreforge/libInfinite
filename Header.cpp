@@ -19,6 +19,7 @@
  * 0x38		(0x04)	Metadata Offset
  * 0x3c		(0x04)	Metadata Length
  * 0x40		(0x04)	Data Length
+ * 0x44		(0x04)	Region 3 Length
  *
  *
  */
@@ -52,6 +53,9 @@ int Header::parseHeader(uint8_t* data){
 
 	data2Offset = dataOffset + dataLength;
 	data2Length = *((uint32_t*) (data + 0x40));
+
+	data3Offset = data2Offset + data2Length;
+	data3Length = *((uint32_t*) (data + 0x44));
 
 	return ERROR_NONE;
 }
