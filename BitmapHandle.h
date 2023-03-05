@@ -27,7 +27,13 @@ public:
 	Item* item;
 	std::vector<MipMap> mipMaps;
 
+	// get the raw data of this bitmap. Will need to be converted/decompressed for most usecases
+	// the returned buffer is allocated, so it has to be freed
 	void* getData(uint8_t level);	// level: Mipmap level, starting at 0
+
+	// get the data of this bitmap in R8G8B8A8 format. This could lead to precision loss, but is the most useful for general applications
+	// the returned buffer is allocated, so it has to be freed
+	void* getR8G8B8A8Data(uint8_t level);
 };
 
 class BitmapHandle{

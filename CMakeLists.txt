@@ -8,6 +8,36 @@ add_library(Infinite SHARED)
 endif()
 
 
+# use compressonator to decompress textures
+if(NOT DEFINED USE_COMPRESSONATOR)
+	set(USE_COMPRESSONATOR OFF)
+endif()
+if(NOT DEFINED COMPRESSONATOR_DIR)
+	set(COMPRESSONATOR_DIR ${CMAKE_CURRENT_LIST_DIR}/3rd_party/compressonator)
+endif()
+
+if(USE_COMPRESSONATOR)
+	message(STATUS "Compressonator is enabled")
+	message(STATUS "Using Compressonator at ${COMPRESSONATOR_DIR}")
+	option(OPTION_ENABLE_ALL_APPS "" OFF)
+	option(OPTION_BUILD_APPS_CMP_GUI "" OFF)
+	option(OPTION_BUILD_APPS_CMP_GUI "" OFF)
+	option(OPTION_CMP_OPENCV "" OFF)
+	option(OPTION_BUILD_APPS_CMP_CLI "" ON)
+	option(OPTION_BUILD_APPS_CMP_TESTCORE "" ON)
+	# because compressonator doesn't like being built like this, the project_source_dir needs to be set
+	set(project_src_dir_old ${PROJECT_SOURCE_DIR})
+	set(${PROJECT_SOURCE_DIR} ${COMPRESSONATOR_DIR})
+#	add_subdirectory(${COMPRESSONATOR_DIR}/cmp_core)
+#	add_subdirectory(${COMPRESSONATOR_DIR}/cmp_framework)
+	add_subdirectory(${COMPRESSONATOR_DIR})
+	set(PROJECT_SOURCE_DIR ${project_src_dir_old})
+endif()
+
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex)
+target_link_libraries(Infinite detex)
+target_include_directories(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex)
+
 if(NOT DEFINED OODLE_LIBRARY)
 	set(OODLE_LIBRARY ${CMAKE_CURRENT_LIST_DIR}/liblinoodle.so)
 endif()
@@ -45,6 +75,11 @@ endif()
 set_target_properties(oodle PROPERTIES IMPORTED_LOCATION ${OODLE_LIBRARY})
 
 target_link_libraries(Infinite oodle)
+
+if(USE_COMPRESSONATOR)
+	target_link_libraries(Infinite CMP_Compressonator)
+	target_include_directories(Infinite PRIVATE ${COMPRESSONATOR_DIR}/cmp_compressonatorlib)
+endif()
 
 #set(LIBINFINITE_LIBRARY_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/libInfinite.so PARENT_SCOPE)
 

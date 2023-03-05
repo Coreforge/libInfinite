@@ -4,6 +4,9 @@
 
 #include <cstring>
 
+#include <file-info.h>
+#include <detex.h>
+
 // Types
 
 #define type_handle_root std::string("R\\xab5#hBJ\\xc2}\\x8fr\\x94#\\x19m\\xd3")
@@ -103,7 +106,7 @@ void* Frame::getData(uint8_t level){
 	}
 	if(mipmapCount != 1){
 		// resource files
-		int resourceIndex = item->moduleItem->resources.size() - level;
+		int resourceIndex = item->moduleItem->resources.size() - level - 1;
 		return item->moduleItem->resources[resourceIndex]->extractData();
 	}
 	// single mipmap
@@ -118,4 +121,48 @@ void* Frame::getData(uint8_t level){
 		}
 	}
 	return nullptr;
+}
+
+/*
+ * TODO:
+ * Problematic formats list
+ * 	BC1_UNORM_SRGB
+ *
+ *
+ */
+
+void* Frame::getR8G8B8A8Data(uint8_t level){
+
+	if(level > mipmapCount){
+		return nullptr;
+	}
+
+	const detexTextureFileInfo* fInfo = detexGetFormatFromDX10Format(format);
+	if(fInfo == nullptr){
+		item->logger->log(LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
+		return nullptr;
+	}
+
+	MipMap mm = mipMaps[level];
+
+	detexTexture tex;
+	tex.height = mm.height;
+	tex.height_in_blocks = mm.height / fInfo->block_height;
+	tex.width = mm.width;
+	tex.width_in_blocks = mm.width / fInfo->block_width;
+	tex.format = fInfo->texture_format;
+
+	uint8_t* dstbuf = (uint8_t*)malloc(mm.height * mm.width * 4);	// expects 32bpp, which is correct for the target format
+
+	uint8_t* rawData = (uint8_t*)getData(level);
+	if(rawData == nullptr){
+		item->logger->log(LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
+		return nullptr;
+	}
+	tex.data = rawData;
+	if(!detexDecompressTextureLinear(&tex, dstbuf, DETEX_PIXEL_FORMAT_RGBA8)){
+		item->logger->log(LOG_LEVEL_ERROR,"There was an error while uncompressing the texture\n");
+	}
+	free(rawData);
+	return dstbuf;
 }

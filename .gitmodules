@@ -1,0 +1,3 @@
+[submodule "3rd_party/detex"]
+	path = 3rd_party/detex
+	url = https://github.com/Coreforge/detex
