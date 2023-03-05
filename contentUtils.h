@@ -5,7 +5,7 @@
 
 #include "ContentTableEntry.h"
 
-std::string pythonByteLiteral(uint8_t byte){
+inline std::string pythonByteLiteral(uint8_t byte){
 	if(byte >= 32 && byte < 127){
 		// printable ASCII-character
 		if(byte == 39){
