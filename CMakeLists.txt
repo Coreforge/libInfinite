@@ -53,7 +53,8 @@ set_property(TARGET Infinite PROPERTY CXX_STANDARD 17)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataTable.cpp ${CMAKE_CURRENT_LIST_DIR}/ContentTable.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/StringTable.cpp ${CMAKE_CURRENT_LIST_DIR}/Item.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Header.cpp ${CMAKE_CURRENT_LIST_DIR}/TagRefTable.cpp)
-target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/BitmapHandle.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/BitmapHandle.cpp
+								${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp)
 
 include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/logger/CMakeLists.txt)
