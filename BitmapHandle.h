@@ -9,6 +9,8 @@
 
 #include "logger/logger.h"
 
+#include <detex.h>
+
 //NOTE: the mipmap level runs opposite to the resource index. MipMap 0 is the largest, but it uses the resource chunk with the highest index
 class MipMap{
 public:
@@ -34,6 +36,9 @@ public:
 	// get the data of this bitmap in R8G8B8A8 format. This could lead to precision loss, but is the most useful for general applications
 	// the returned buffer is allocated, so it has to be freed
 	void* getR8G8B8A8Data(uint8_t level);
+
+	// return.data is allocated and has to be freed
+	detexTexture getDetexTexture(uint8_t level);
 };
 
 class BitmapHandle{

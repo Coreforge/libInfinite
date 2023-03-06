@@ -87,3 +87,5 @@ endif()
 if(${INFINITE_COPY_OODLE_DLL})
 	configure_file(${CMAKE_CURRENT_LIST_DIR}/${INFINITE_OODLE_DLL} ${INFINITE_OODLE_DLL} COPYONLY)
 endif()
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex/LICENSE detex_LICENSE COPYONLY)

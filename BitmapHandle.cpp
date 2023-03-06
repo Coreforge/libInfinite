@@ -123,11 +123,43 @@ void* Frame::getData(uint8_t level){
 	return nullptr;
 }
 
+detexTexture Frame::getDetexTexture(uint8_t level){
+	detexTexture tex;
+	tex.data = nullptr;
+	if(level > mipmapCount){
+		return tex;
+	}
+
+	const detexTextureFileInfo* fInfo = detexGetFormatFromDX10Format(format);
+	if(fInfo == nullptr){
+		item->logger->log(LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
+		return tex;
+	}
+
+	MipMap mm = mipMaps[level];
+
+
+	tex.height = mm.height;
+	tex.height_in_blocks = mm.height / fInfo->block_height;
+	tex.width = mm.width;
+	tex.width_in_blocks = mm.width / fInfo->block_width;
+	tex.format = fInfo->texture_format;
+
+	uint8_t* rawData = (uint8_t*)getData(level);
+	if(rawData == nullptr){
+		item->logger->log(LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
+		return tex;
+	}
+	tex.data = rawData;
+
+	return tex;
+}
+
 /*
  * TODO:
  * Problematic formats list
- * 	BC1_UNORM_SRGB
- *
+ * 	R11G11B10_FLOAT 26 (not supported at all in detex)
+ *	B8G8R8A8_UNORM_SRGB (environments)
  *
  */
 
