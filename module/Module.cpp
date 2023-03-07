@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstring>
 
+//#define USE_ASSET_IDS_INSTEAD_OF_PATHS
+
 int Module::loadModule(FILE* file, const char* name){
 	fileHandle = file;
 
@@ -113,6 +115,7 @@ int Module::loadModule(FILE* file, const char* name){
 		item->stringOffset = *(uint32_t*)(itm + 0x40);
 		item->tagType = *(uint32_t*)(itm + 0x14);
 		item->parentIndex = *(uint32_t*)(itm + 0x44);
+		item->assetID = *(uint32_t*)(itm + 0x28);
 		item->module = this;
 
 		if(item->parentIndex != -1 && item->parentIndex < tmpVec.size()){
@@ -137,7 +140,30 @@ int Module::loadModule(FILE* file, const char* name){
 		std::replace(item->path.begin(), item->path.end(), ':', '_');
 		//printf("%s\n",strings + item->stringOffset);
 
+#ifdef USE_ASSET_IDS_INSTEAD_OF_PATHS
+		char buf[10];
+		snprintf(buf,10,"%08x",item->assetID);
+		std::string typePrefix = std::string((char*)&(item->tagType),4);
+		std::reverse(typePrefix.begin(), typePrefix.end());
+		item->path = typePrefix + std::string("/") + std::string(buf);
+		if(item->tagType == -1){
+			// non-tag file
+			if(item->parentIndex == -1){
+				// no parent file. Probably runtimeloadmetadata
+			} else {
+				// since the resources are located at the end of the list, all the tags should already be loaded
+				std::string p = tmpVec[item->parentIndex]->path;
+				item->path = p + std::string(".resources/") + std::to_string(tmpVec[item->parentIndex]->resources.size());
+			}
+		}
+
 		//finally add the item to the list of items
+		if(items.count(item->path) > 0){
+			logger->log(LOG_LEVEL_WARNING, "Duplicate asset ID %s!\n",item->path.c_str());
+		}
+
+		//finally add the item to the list of items
+#endif
 		items.insert(std::pair<std::string, ModuleItem*>(item->path, item));
 		tmpVec.emplace_back(item);
 		free(itm);

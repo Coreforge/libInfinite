@@ -18,6 +18,7 @@ public:
 	uint32_t compressedSize;
 	uint32_t decompressedSize;
 	uint32_t stringOffset;
+	uint32_t assetID;
 	uint32_t parentIndex;
 	uint32_t tagType;
 	std::string path;
