@@ -45,7 +45,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/logger/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/tags/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/models/CMakeLists.txt)
-include(${CMAKE_CURRENT_LIST_DIR}/utils/CMakeLists.txt)
+#include(${CMAKE_CURRENT_LIST_DIR}/utils/CMakeLists.txt)
 
 
 
