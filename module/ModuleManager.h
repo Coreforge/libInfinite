@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <shared_mutex>
+#include <map>
 
 class ModuleManager{
 public:
@@ -25,6 +26,8 @@ public:
 	void buildNodeTree();
 	void deleteNodeTree();
 	ModuleNode* getNode(std::string path);
+
+	std::map<uint32_t, ModuleItem*> assetIdItems;
 
 private:
 	void deleteTreeRecursive(ModuleNode* node);

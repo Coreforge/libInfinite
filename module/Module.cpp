@@ -141,6 +141,7 @@ int Module::loadModule(FILE* file, const char* name){
 				// non-tag file
 				if(item->parentIndex == -1){
 					// no parent file. Probably runtimeloadmetadata
+					item->path = std::string("ffffffff/") + std::string(buf);
 				} else {
 					// since the resources are located at the end of the list, all the tags should already be loaded
 					std::string p = tmpVec[item->parentIndex]->path;

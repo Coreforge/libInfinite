@@ -40,10 +40,10 @@ int Header::parseHeader(uint8_t* data){
 	contentTableOffset = dataTableOffset + dataTableCount * 0x10;
 	contentTableCount = *((uint32_t*) (data + 0x20));
 
-	dataBlockTableOffset = contentTableOffset + contentTableCount * 0x20;
-	dataBlockTableCount = *((uint32_t*) (data + 0x24));
+	dataReferenceTableOffset = contentTableOffset + contentTableCount * 0x20;
+	dataReferenceTableCount = *((uint32_t*) (data + 0x24));
 
-	stringTableOffset = dataBlockTableOffset + dataBlockTableCount * 0x14;
+	stringTableOffset = dataReferenceTableOffset + dataReferenceTableCount * 0x14;
 	stringCount = *((uint32_t*) (data + 0x28));
 	stringLength = *((uint32_t*) (data + 0x2c));
 	stringDataOffset = stringTableOffset + (stringCount * 0x10);

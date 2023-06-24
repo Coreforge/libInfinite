@@ -3,12 +3,15 @@
 #include "Header.h"
 #include "DataTable.h"
 #include "ContentTable.h"
-#include "StringTable.h"
 #include "TagRefTable.h"
+#include "DataRefTable.h"
 #include "logger/logger.h"
 #include "module/ModuleItem.h"
 
 #include <string>
+#include "TagRefFieldTable.h"
+
+class TagManager;
 
 class Item{
 
@@ -17,9 +20,12 @@ public:
 	Header header;
 	DataTable dataTable;
 	ContentTable contentTable;
-	StringTable stringTable;
+	TagRefFieldTable tagRefFieldTable;
 	TagRefTable tagRefTable;
+	DataRefTable dataRefTable;
 	Logger* logger;
+
+	TagManager* tagManager;
 
 	std::string name;
 	std::string path;

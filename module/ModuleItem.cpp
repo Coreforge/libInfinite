@@ -9,10 +9,12 @@ unsigned char* ModuleItem::extractData(){
 	uint64_t offset = dataOffset;
 	FILE* handle = module->fileHandle;
 	// this assumes that a single item is either is the base module or the _hd1 and never split across the two files
-	if(dataOffset > module->data_size){
-		module->logger->log(LOG_LEVEL_ERROR,"Error: Data for %s is beyond the end of the module\n",path.c_str());
-		free(data);
-		return nullptr;
+	if(module->version < 0x34){	// this field isn't useful anymore past this version
+		if(dataOffset > module->data_size){
+			module->logger->log(LOG_LEVEL_ERROR,"Error: Data for %s is beyond the end of the module\n",path.c_str());
+			free(data);
+			return nullptr;
+		}
 	}
 	//if(dataOffset > module->hd1_delta && module->hd1Handle){
 	//printf("Item offset: 0x%lx\n",this->offset);

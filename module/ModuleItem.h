@@ -22,6 +22,7 @@ public:
 	uint32_t parentIndex;
 	uint32_t tagType;
 	std::string path;
+	std::string name;
 	ModuleItem* parent;
 
 	// debugging/research stuff, not needed for normal operation

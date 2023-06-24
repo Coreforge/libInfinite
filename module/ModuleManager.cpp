@@ -34,8 +34,10 @@ void ModuleManager::buildNodeTree(){
 			std::stringstream stream(key);
 			std::string part;
 			ModuleNode* currentParent = rootNode;
+			int lastCount = 0;
 			while(std::getline(stream,part,'/')){
 				// path broken down into the individual segments
+				lastCount = currentParent->children.count(part);
 				if(currentParent->children.count(part) == 0){
 					// this segment doesn't exist yet, create it
 					//printf("adding node %s\n",part.c_str());
@@ -51,8 +53,21 @@ void ModuleManager::buildNodeTree(){
 				//printf("Part: %s\n",part.c_str());
 			}
 			// currentParent is now the one for the lest segment (file name)
+			if(lastCount != 0){
+				if(value->tagType != -1){
+					logger->log(LOG_LEVEL_WARNING,"Duplicate Path: %s tag class %c%c%c%c\n",key.c_str(), *(((uint8_t*)&value->tagType) + 3 ),*(((uint8_t*)&value->tagType) + 2 ),*(((uint8_t*)&value->tagType) + 1 ), *(((uint8_t*)&value->tagType) + 0 ) );
+				} else {
+					logger->log(LOG_LEVEL_WARNING,"Duplicate Path: %s tag class (not a tag file)\n",key.c_str());
+				}
+			}
 			currentParent->type = NODE_TYPE_FILE;
 			currentParent->item = value;
+			currentParent->item->path = currentParent->path;
+			currentParent->item->name = currentParent->name;
+
+			// GlobalId stuff
+			//assetIdItems.insert({currentParent->item->assetID,currentParent->item});
+			assetIdItems[currentParent->item->assetID] = currentParent->item;
 		}
 	}
 	mutex.unlock();

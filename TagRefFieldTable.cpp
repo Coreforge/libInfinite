@@ -1,10 +1,9 @@
-#include "StringTable.h"
-
 #include "Errors.h"
 
 #include <stdint.h>
+#include <TagRefFieldTable.h>
 
-int StringTable::readStrings(uint8_t* data, uint32_t count, uint32_t length, uint8_t* stringData){
+int TagRefFieldTable::readStrings(uint8_t* data, uint32_t count, uint32_t length, uint8_t* stringData, bool readStrings){
 
 	/*
 	 * Offset	Size	Function
@@ -22,18 +21,25 @@ int StringTable::readStrings(uint8_t* data, uint32_t count, uint32_t length, uin
 
 	for(int i = 0; i < count; i++){
 		uint32_t entryOffset = i * 0x10;
-		uint32_t type = *((uint32_t*)(data + entryOffset));
-		uint32_t some_offset = *((uint32_t*)(data + entryOffset + 0x04));
+		uint32_t fieldBlockIndex = *((uint32_t*)(data + entryOffset));
+		uint32_t fieldBlockOffset = *((uint32_t*)(data + entryOffset + 0x04));
 		uint32_t offset = *((uint32_t*)(data + entryOffset + 0x08));
 		uint32_t index = *((uint32_t*)(data + entryOffset + 0x0c));
 
+		std::string str;
+		if(readStrings){
+			str = std::string((const char*)(stringData + offset));
+		}
+		TagRefFieldTableEntry ent(str, fieldBlockIndex, fieldBlockOffset, index,offset);
+		entries.emplace_back(ent);
+
 		if(index < count){
 			// valid index
-			strings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index,offset));
+			strings.emplace_back(ent);
 		} else {
 			// invalid index
 			// probably not used, but might be interesting
-			invalidStrings.emplace_back(StringTableEntry(std::string((const char*)(stringData + offset)), type, some_offset, index, offset));
+			invalidStrings.emplace_back(ent);
 		}
 	}
 	return ERROR_NONE;

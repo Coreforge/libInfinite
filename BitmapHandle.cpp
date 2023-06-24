@@ -42,7 +42,7 @@ BitmapHandle::BitmapHandle(ModuleItem* moduleItem, Logger* logger){
 		// these are the *\x80\xeb ones
 		ContentTableEntry* frame = frameInfoEntry->children[i];
 		Item* frameItem = item;
-		if(frame->type_id != 1){
+		if(frame->is_external != 1){
 			// this is the case for multi frame ones. The data has to be loaded from the resource files
 			ModuleItem* frameModuleItem = moduleItem->resources[i];
 			void* frameData = frameModuleItem->extractData();

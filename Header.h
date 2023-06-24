@@ -19,8 +19,8 @@ public:
 	uint32_t contentTableOffset;
 	uint32_t contentTableCount;
 
-	uint32_t dataBlockTableOffset;
-	uint32_t dataBlockTableCount;
+	uint32_t dataReferenceTableOffset;
+	uint32_t dataReferenceTableCount;
 
 	uint32_t stringTableOffset;
 	uint32_t stringDataOffset;

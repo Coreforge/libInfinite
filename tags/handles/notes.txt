@@ -1,0 +1,20 @@
+Stored in buffer struct:
+	weak_ptr pointer (for the managed handle)
+	actual buffer handle pointer
+	atomic uint8_t to show if the actual buffer handle still exists
+	
+	
+classes:
+	actual buffer handle class:
+		This class handles the actual buffer. It should live as long as the buffer does, so it only gets deleted by the GC, and nothing else
+		If a buffer is reused after refcount drops to 0, but it's not deleted yet, this class can be used again
+	
+		constructor: (data pointer, data size, void* for additional data)
+	
+	
+	managed buffer handle class:
+		managed by the std::shared_ptrs, only one exists per buffer at a time, and it gets deleted once the refcount drops to 0
+		The destructor should add the actual buffer handle to the GC queue to mark it for deletion
+		If a buffer has been marked for deletion but a new managed buffer handle gets created for it (buffer gets reused), the contructor should mark that buffer as reused so that the GC can just pop it from the queue without deleting it
+		
+		constructor: (actual buffer handle)

@@ -1,38 +1,19 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(Infinite VERSION 0.1.0)
 
+# ASAN options
+if(OFF)
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fsanitize=address PARENT_SCOPE)
+	set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address PARENT_SCOPE)
+	set(CMAKE_MODULE_LINKER_FLAGS ${CMAKE_MODULE_LINKER_FLAGS} -fsanitize=address PARENT_SCOPE)
+endif()
+
 if(WIN32 AND NOT CREATE_DLL)
 add_library(Infinite)
 else()
 add_library(Infinite SHARED)
 endif()
 
-
-# use compressonator to decompress textures
-if(NOT DEFINED USE_COMPRESSONATOR)
-	set(USE_COMPRESSONATOR OFF)
-endif()
-if(NOT DEFINED COMPRESSONATOR_DIR)
-	set(COMPRESSONATOR_DIR ${CMAKE_CURRENT_LIST_DIR}/3rd_party/compressonator)
-endif()
-
-if(USE_COMPRESSONATOR)
-	message(STATUS "Compressonator is enabled")
-	message(STATUS "Using Compressonator at ${COMPRESSONATOR_DIR}")
-	option(OPTION_ENABLE_ALL_APPS "" OFF)
-	option(OPTION_BUILD_APPS_CMP_GUI "" OFF)
-	option(OPTION_BUILD_APPS_CMP_GUI "" OFF)
-	option(OPTION_CMP_OPENCV "" OFF)
-	option(OPTION_BUILD_APPS_CMP_CLI "" ON)
-	option(OPTION_BUILD_APPS_CMP_TESTCORE "" ON)
-	# because compressonator doesn't like being built like this, the project_source_dir needs to be set
-	set(project_src_dir_old ${PROJECT_SOURCE_DIR})
-	set(${PROJECT_SOURCE_DIR} ${COMPRESSONATOR_DIR})
-#	add_subdirectory(${COMPRESSONATOR_DIR}/cmp_core)
-#	add_subdirectory(${COMPRESSONATOR_DIR}/cmp_framework)
-	add_subdirectory(${COMPRESSONATOR_DIR})
-	set(PROJECT_SOURCE_DIR ${project_src_dir_old})
-endif()
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex)
 target_link_libraries(Infinite detex)
@@ -48,18 +29,25 @@ message(STATUS "Using oodle from ${OODLE_LIBRARY}")
 #target_include_directories(Infinite PRIVATE ${GTKMM_INCLUDE_DIRS})
 
 
-set_property(TARGET Infinite PROPERTY CXX_STANDARD 17)
+set_property(TARGET Infinite PROPERTY CXX_STANDARD 20)
+
+target_include_directories(Infinite PUBLIC .)
 
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataTable.cpp ${CMAKE_CURRENT_LIST_DIR}/ContentTable.cpp)
-target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/StringTable.cpp ${CMAKE_CURRENT_LIST_DIR}/Item.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/TagRefFieldTable.cpp ${CMAKE_CURRENT_LIST_DIR}/Item.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Header.cpp ${CMAKE_CURRENT_LIST_DIR}/TagRefTable.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataRefTable.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/BitmapHandle.cpp
-								${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp)
+								${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp
+								${CMAKE_CURRENT_LIST_DIR}/StringIDLUT.cpp)
 
 include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/logger/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/tags/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/models/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/utils/CMakeLists.txt)
 
-target_include_directories(Infinite PUBLIC .)
+
 
 #target_link_libraries(infiniteExplorer ${GTKMM_LIBRARIES})
 
