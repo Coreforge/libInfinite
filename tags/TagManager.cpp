@@ -11,6 +11,7 @@
 #include "handles/modeHandle.h"
 #include "handles/mat_Handle.h"
 #include "handles/rtgoHandle.h"
+#include "handles/pmdfHandle.h"
 #include "handles/sbspHandle.h"
 #include "handles/vartHandle.h"
 
@@ -35,7 +36,7 @@ int TagManager::addTag(uint32_t globalId){
 Tag* TagManager::getTag(uint32_t globalId){
 	if(loadedTags.count(globalId) > 0){
 		loadedTags[globalId]->uses++;
-		printf("Tag already loaded\n");
+		//printf("Tag already loaded\n");
 		return loadedTags[globalId];
 	}
 
@@ -54,6 +55,8 @@ Tag* TagManager::getTagObject(uint32_t type){
 		return new modeHandle();
 	case 'rtgo':
 		return new rtgoHandle();
+	case 'pmdf':
+		return new pmdfHandle();
 	case 'sbsp':
 		return new sbspHandle();
 	case 'mat ':

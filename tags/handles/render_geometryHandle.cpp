@@ -11,6 +11,8 @@
 #include <tags/xml/generated/mode.h>
 
 
+#define MESH_NO_INDEX_BUFFER (1<<4)
+
 /*
  * reused struct fields:
  * 	pc_vertex_buffers:
@@ -79,7 +81,13 @@ bufferInfo render_geometryHandle::getVertexBuffer(uint16_t index){
 	ret.count = buf->count;
 	ret.stride = buf->stride;
 	ret.size = buf->d3dbuffer_ent.byte_width;
-	ret.data = tag->getResource(buf->offset, buf->d3dbuffer_ent.byte_width);
+	if(buf->d3dbuffer_ent.d3d_buffer.size == 0){
+		// in a separate resource file (at least mode and rtgo)
+		ret.data = tag->getResource(buf->offset, buf->d3dbuffer_ent.byte_width);
+	} else {
+		// embedded into the tag file (so far seen in pmdf)
+		ret.data = buf->d3dbuffer_ent.d3d_buffer.data;
+	}
 
 	return ret;
 
@@ -135,6 +143,18 @@ bool render_geometryHandle::hasMeshInfo(uint32_t meshIndex, uint32_t lod){
 
 bool render_geometryHandle::hasVertexBufferInfo(uint16_t idx){
 	return checkGenericMapEntry(idx, vtxWeakPointers);
+}
+
+uint16_t render_geometryHandle::getMeshFlags(uint32_t meshIndex){
+	mode::render_geometry* str = (mode::render_geometry*) struct_ptr;
+	assert(meshIndex < str->meshes_ent.count && "Invalid mesh index");
+	return str->meshes_ent.block[meshIndex].flags_mesh_flags;
+}
+
+uint8_t render_geometryHandle::getIndexBufferType(uint32_t meshIndex){
+	mode::render_geometry* str = (mode::render_geometry*) struct_ptr;
+	assert(meshIndex < str->meshes_ent.count && "Invalid mesh index");
+	return str->meshes_ent.block[meshIndex].enum_index_buffer_type;
 }
 
 bufferInfo render_geometryHandle::getIndexBuffer(uint16_t index){

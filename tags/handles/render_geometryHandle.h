@@ -58,6 +58,9 @@ public:
 	uint32_t getPartCount(uint32_t meshIndex, uint32_t lod);
 	partInfo getPartInfo(uint32_t meshIndex, uint32_t lod, uint32_t part);
 
+	uint16_t getMeshFlags(uint32_t meshIndex);
+	uint8_t getIndexBufferType(uint32_t meshIndex);
+
 	bool hasMeshInfo(uint32_t meshIndex, uint32_t lod);
 
 	// returns a shared pointer for the mesh info object if one exists, or creates a new one if no object exists
