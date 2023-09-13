@@ -5,6 +5,9 @@
 #include <cassert>
 #include "../TagManager.h"
 
+
+
+
 void sbspHandle::setup(){
 	sbsp* str = (sbsp*)root;
 }
@@ -28,6 +31,8 @@ geoInstanceInfo sbspHandle::getGeoInstanceInfo(uint32_t index){
 	info.left = glm::vec3(inst->left.x,inst->left.y,inst->left.z);
 	info.forward = glm::vec3(inst->forward.x,inst->forward.y,inst->forward.z);
 	info.up = glm::vec3(inst->up.x,inst->up.y,inst->up.z);
+
+	info.mesh_flags_override = inst->material_override_data_ent.flags_mesh_flags_override;
 
 	if(item->tagManager != nullptr){
 		Tag* tmptag = this->item->tagManager->getTag(inst->Runtime_geo_mesh_reference.globalId);

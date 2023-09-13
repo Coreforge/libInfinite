@@ -16,6 +16,7 @@ if len(sys.argv) < 2:
 # different structs must have unique names in the XMLs
 addDuplicateStructNames = False
 addDuplicateEnumNames = False
+flagsUniqueNames = True
 
 # Type definitions
 # https://github.com/Gamergotten/Infinite-runtime-tagviewer/blob/master/Halo/TagObjects/TagLayouts.cs
@@ -63,6 +64,7 @@ class tagStructParser:
         self.knownStructs = {}
         self.knownEnums = []
         self.TypePrefix = ""
+        self.knownFlags = []
 
 
     def cleanNames(self, name : str):
@@ -74,6 +76,25 @@ class tagStructParser:
             cleaned = "register_field"
         return cleaned
 
+
+    def flagProcessName(self, name:str):
+        if not flagsUniqueNames:
+            # don't change any names.
+            return name
+        
+        # a lot of flag fields are just called 'flags', so it's often unclear which field which definitions belong to
+        if name not in self.knownFlags:
+            self.knownFlags.append(name)
+            return name
+
+        # already a field with that name
+        x = 2
+        while True:
+            if f"{name}_{x}" in self.knownFlags:
+                x += 1
+                continue
+            self.knownFlags.append(f"{name}_{x}")
+            return f"{name}_{x}"
 
     # process an XML Entry. Returns the code to put at that place, 
     # either just for the field, or a pointer to a struct or other.
@@ -109,6 +130,7 @@ class tagStructParser:
     def parseFlags(self, eType, element, indentLevel):
         indentString = "".join([self.indent for x in range(indentLevel)])
         fieldName = self.cleanNames(element.attrib["v"])
+        fieldName = self.flagProcessName(fieldName)
 
         # add the flag definitions
         self.flagDefinitions += f"// Field {fieldName}\n\n"

@@ -10,7 +10,7 @@
   * Changes will not persist otherwise!
   */
 
-// Generated from: hirt/mode.xml
+// Generated from: hirt2/mode.xml
 
 // Flag Definitions
 
@@ -26,33 +26,33 @@
 #define FLAGS_REQUIRES_HOLOGRAM_PREPASS (1<<7)
 
 
-// Field flags
+// Field flags_2
 
-#define FLAGS_FORCEDETERMINISTIC (1<<0)
-#define FLAGS_FORCERENDERTHREAD (1<<1)
-
-
-// Field flags
-
-#define FLAGS_HAS_NODE_RELATIVE_DIRECTION (1<<0)
+#define FLAGS_2_FORCEDETERMINISTIC (1<<0)
+#define FLAGS_2_FORCERENDERTHREAD (1<<1)
 
 
-// Field flags
+// Field flags_3
 
-#define FLAGS_RENDERED (1<<0)
-#define FLAGS_TANGENT_SPACE (1<<1)
-#define FLAGS_NON_CRITICAL (1<<2)
-#define FLAGS_LIGHTMAP_LIGHT (1<<3)
-#define FLAGS_REPORT_KEY_IS_VALID (1<<4)
+#define FLAGS_3_HAS_NODE_RELATIVE_DIRECTION (1<<0)
 
 
-// Field flags
+// Field flags_4
 
-#define FLAGS_RENDERED (1<<0)
-#define FLAGS_TANGENT_SPACE (1<<1)
-#define FLAGS_NON_CRITICAL (1<<2)
-#define FLAGS_LIGHTMAP_LIGHT (1<<3)
-#define FLAGS_REPORT_KEY_IS_VALID (1<<4)
+#define FLAGS_4_RENDERED (1<<0)
+#define FLAGS_4_TANGENT_SPACE (1<<1)
+#define FLAGS_4_NON_CRITICAL (1<<2)
+#define FLAGS_4_LIGHTMAP_LIGHT (1<<3)
+#define FLAGS_4_REPORT_KEY_IS_VALID (1<<4)
+
+
+// Field flags_5
+
+#define FLAGS_5_RENDERED (1<<0)
+#define FLAGS_5_TANGENT_SPACE (1<<1)
+#define FLAGS_5_NON_CRITICAL (1<<2)
+#define FLAGS_5_LIGHTMAP_LIGHT (1<<3)
+#define FLAGS_5_REPORT_KEY_IS_VALID (1<<4)
 
 
 // Field runtime_flags
@@ -68,11 +68,11 @@
 #define RUNTIME_FLAGS_MESH_STREAMING (1<<8)
 
 
-// Field flags
+// Field flags_6
 
-#define FLAGS_INDICES_ARE_TRIANGLE_STRIPS (1<<0)
-#define FLAGS_INDICES_ARE_TRIANGLE_LISTS (1<<1)
-#define FLAGS_INDICES_ARE_QUAD_LISTS (1<<2)
+#define FLAGS_6_INDICES_ARE_TRIANGLE_STRIPS (1<<0)
+#define FLAGS_6_INDICES_ARE_TRIANGLE_LISTS (1<<1)
+#define FLAGS_6_INDICES_ARE_QUAD_LISTS (1<<2)
 
 
 // Field part_flags
@@ -137,17 +137,17 @@
 #define META_DATA_FLAGS_HAS_BLENDSHAPE (1<<0)
 
 
-// Field flags
+// Field flags_7
 
-#define FLAGS_16_BIT_INDICES (1<<0)
+#define FLAGS_7_16_BIT_INDICES (1<<0)
 
 
-// Field flags
+// Field flags_8
 
-#define FLAGS_TRANSPARENT_WRITE_DEPTH (1<<0)
-#define FLAGS_TAA_MASK (1<<1)
-#define FLAGS_TAA_WRITE_VELOCITY (1<<2)
-#define FLAGS_NO_FOG (1<<3)
+#define FLAGS_8_TRANSPARENT_WRITE_DEPTH (1<<0)
+#define FLAGS_8_TAA_MASK (1<<1)
+#define FLAGS_8_TAA_WRITE_VELOCITY (1<<2)
+#define FLAGS_8_NO_FOG (1<<3)
 
 
 
@@ -441,7 +441,7 @@ struct nodes{
     shortBlockIndex parent_node;
     shortBlockIndex first_child_node;
     shortBlockIndex next_sibling_node;
-    uint16_t flags_flags;
+    uint16_t flags_flags_2;
     struct point3D default_translation;
     realQuaternion default_rotation;
     struct vector3D inverse_forward;
@@ -479,7 +479,7 @@ struct markers{
     uint16_t generated_padb0cb_2;
     uint32_t permutation_index;
     uint16_t node_index;
-    uint8_t flags_flags;
+    uint8_t flags_flags_3;
     uint8_t generated_pad6416;
     struct point3D translation;
     realQuaternion rotation;
@@ -587,7 +587,7 @@ struct comments{
 struct reports{
     uint8_t enum_type;
     uint8_t enum_source;
-    uint16_t flags_flags;
+    uint16_t flags_flags_5;
     struct dataReference text;
     uint32_t source_identifier;
     char source_filename[32];
@@ -611,7 +611,7 @@ struct errors{
     char name[256];
     uint8_t enum_report_type;
     uint8_t generated_padf276;
-    uint16_t flags_flags;
+    uint16_t flags_flags_4;
     uint16_t runtime_generation_flags;
     uint16_t generated_pad3f2b;
     uint32_t runtime_something;
@@ -733,7 +733,7 @@ struct per_mesh_temporary{
     struct tagBlock<raw_tension_edges> raw_tension_edges_ent;
     struct tagBlock<raw_blendshapes_triangle_and_edge_Indices> raw_blendshapes_triangle_and_edge_Indices_ent;
     struct tagBlock<raw_blendshapes_triangle_and_edge_index_info> raw_blendshapes_triangle_and_edge_index_info_ent;
-    uint32_t flags_flags;
+    uint32_t flags_flags_6;
     struct tagBlock<level_breakdown_data> level_breakdown_data_ent;
 };
 
@@ -1096,7 +1096,7 @@ struct cloth_meshes{
     uint32_t nameHash;
     struct tagBlock<meshIndex> meshIndex_ent;
     uint32_t meshLodIndex;
-    uint16_t flags_flags;
+    uint16_t flags_flags_7;
     uint16_t numVertexComponents;
     uint32_t vertexCount;
     uint32_t triangleCount;
@@ -1116,7 +1116,7 @@ struct cloth_datas{
 struct MaterialPipelineStateInfos{
     struct tagReference shader;
     uint8_t enum_alpha_blend_mode;
-    uint8_t flags_flags;
+    uint8_t flags_flags_8;
     uint16_t generated_pad67cc;
 };
 
@@ -1124,7 +1124,7 @@ struct MaterialPipelineStateInfos{
 // Root Block
 
 struct mode{
-    struct anon_struct_0{
+    struct AnyTag{
         uint64_t vtable_space;
         struct internal_struct{
             uint32_t global_tag_ID;
@@ -1132,7 +1132,7 @@ struct mode{
         };
         struct internal_struct internal_struct_ent;
     };
-    struct anon_struct_0 anon_struct_0_ent;
+    struct AnyTag AnyTag_ent;
     string_id name;
     uint16_t flags_flags;
     uint16_t version;

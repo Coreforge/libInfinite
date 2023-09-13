@@ -136,13 +136,14 @@ bufferInfo render_geometryHandle::getVertexBuffer(uint16_t index){
 	return std::shared_ptr<managed>();*/
 }
 
-bool render_geometryHandle::hasMeshInfo(uint32_t meshIndex, uint32_t lod){
-	uint64_t idx = ((uint64_t)meshIndex) << 32 | lod;
+bool render_geometryHandle::hasMeshInfo(uint32_t meshIndex, uint16_t lod, uint16_t channel){
+	uint64_t idx = ((uint64_t)meshIndex) << 32 | lod << 16 | channel;
 	return checkGenericMapEntry(idx, meshInfoMap);
 }
 
-bool render_geometryHandle::hasVertexBufferInfo(uint16_t idx){
-	return checkGenericMapEntry(idx, vtxWeakPointers);
+bool render_geometryHandle::hasVertexBufferInfo(uint16_t idx, uint16_t channel){
+	uint64_t nidx = idx | channel << 16;
+	return checkGenericMapEntry(nidx, vtxWeakPointers);
 }
 
 uint16_t render_geometryHandle::getMeshFlags(uint32_t meshIndex){
@@ -174,8 +175,9 @@ bufferInfo render_geometryHandle::getIndexBuffer(uint16_t index){
 	return ret;
 }
 
-bool render_geometryHandle::hasIndexBufferInfo(uint16_t idx){
-	return checkGenericMapEntry(idx, idxWeakPointers);
+bool render_geometryHandle::hasIndexBufferInfo(uint16_t idx, uint16_t channel){
+	uint64_t nidx = idx | channel << 16;
+	return checkGenericMapEntry(nidx, idxWeakPointers);
 }
 
 partInfo render_geometryHandle::getPartInfo(uint32_t meshIndex, uint32_t lod, uint32_t part){

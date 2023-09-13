@@ -10,7 +10,7 @@
   * Changes will not persist otherwise!
   */
 
-// Generated from: hirt/rtgo.xml
+// Generated from: hirt2/rtgo.xml
 
 // Flag Definitions
 
@@ -727,7 +727,7 @@ struct marker_groups{
 // Root Block
 
 struct rtgo{
-    struct anon_struct_0{
+    struct AnyTag{
         uint64_t vtable_space;
         struct internal_struct{
             uint32_t global_tag_ID;
@@ -735,7 +735,7 @@ struct rtgo{
         };
         struct internal_struct internal_struct_ent;
     };
-    struct anon_struct_0 anon_struct_0_ent;
+    struct AnyTag AnyTag_ent;
     struct tagBlock<Per_Mesh_Data> Per_Mesh_Data_ent;
     uint32_t generated_pad8ff5;
     struct render_geometry{

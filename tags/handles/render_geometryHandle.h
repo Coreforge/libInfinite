@@ -27,19 +27,19 @@ private:
 	// There's no setter for now, as an object just gets created in the getter if there isn't one. Only one type should be used per index for the lifetime of the tag
 
 	template<class t, typename idx>
-	std::shared_ptr<t> getGenericMapEntry(idx elementIndex,  std::unordered_map<idx,std::weak_ptr<GenericHandle>> theMap){
+	std::shared_ptr<t> getGenericMapEntry(idx elementIndex,  std::unordered_map<idx,std::weak_ptr<GenericHandle>> & theMap){
 		if(theMap.find(elementIndex) == theMap.end() || theMap[elementIndex].expired()){
 			// not present, create a new element
 			std::shared_ptr<t> ptr = std::make_shared<t>();
 			theMap[elementIndex] = ptr;
-			return ptr;
+			return std::shared_ptr<t>(ptr);
 		}
 		// there is an existing and valid element
 		return std::dynamic_pointer_cast<t>(theMap[elementIndex].lock());
 	}
 
 	template<typename idx>
-	bool checkGenericMapEntry(idx elementIndex,  std::unordered_map<idx,std::weak_ptr<GenericHandle>> theMap){
+	bool checkGenericMapEntry(idx elementIndex,  std::unordered_map<idx,std::weak_ptr<GenericHandle>> & theMap){
 		if(theMap.find(elementIndex) == theMap.end() || theMap[elementIndex].expired()){
 			return false;
 		}
@@ -61,13 +61,14 @@ public:
 	uint16_t getMeshFlags(uint32_t meshIndex);
 	uint8_t getIndexBufferType(uint32_t meshIndex);
 
-	bool hasMeshInfo(uint32_t meshIndex, uint32_t lod);
+	bool hasMeshInfo(uint32_t meshIndex, uint16_t lod, uint16_t channel = 0);
 
 	// returns a shared pointer for the mesh info object if one exists, or creates a new one if no object exists
+	// the channel argument allows multiple parts that use different handle types to use this feature
 	template<class t>
-	std::shared_ptr<t> getMeshInfo(uint32_t meshIndex, uint32_t lod){
+	std::shared_ptr<t> getMeshInfo(uint32_t meshIndex, uint16_t lod, uint16_t channel = 0){
 		static_assert(std::is_base_of<GenericHandle,t>::value, "Type must be derived from GenericHandle!");
-		uint64_t idx = ((uint64_t)meshIndex) << 32 | lod;
+		uint64_t idx = ((uint64_t)meshIndex) << 32 | lod << 16 | channel;
 
 		return getGenericMapEntry<t,uint64_t>(idx, meshInfoMap);
 		/*if(meshInfoMap.count(idx) != 0 && !meshInfoMap[idx].expired()){
@@ -91,25 +92,25 @@ public:
 	bufferInfo getVertexBuffer(uint16_t index);
 
 	template<class t>
-	std::shared_ptr<t> getVertexBufferInfo(uint16_t idx){
+	std::shared_ptr<t> getVertexBufferInfo(uint16_t idx, uint16_t channel = 0){
 		static_assert(std::is_base_of<GenericHandle,t>::value, "Type must be derived from GenericHandle!");
-		return getGenericMapEntry<t,uint16_t>(idx, vtxWeakPointers);
+		return getGenericMapEntry<t,uint64_t>(idx | channel << 16, vtxWeakPointers);
 	}
 
-	bool hasVertexBufferInfo(uint16_t idx);
+	bool hasVertexBufferInfo(uint16_t idx, uint16_t channel = 0);
 
 	// same, but pc_index_buffer this time
 	bufferInfo getIndexBuffer(uint16_t index);
 	template<class t>
-	std::shared_ptr<t> getIndexBufferInfo(uint16_t idx){
+	std::shared_ptr<t> getIndexBufferInfo(uint16_t idx, uint16_t channel = 0){
 		static_assert(std::is_base_of<GenericHandle,t>::value, "Type must be derived from GenericHandle!");
-		return getGenericMapEntry<t,uint16_t>(idx, idxWeakPointers);
+		return getGenericMapEntry<t,uint64_t>(idx | channel << 16, idxWeakPointers);
 	}
 
-	bool hasIndexBufferInfo(uint16_t idx);
+	bool hasIndexBufferInfo(uint16_t idx, uint16_t channel = 0);
 
 private:
-	std::unordered_map<uint16_t, std::weak_ptr<GenericHandle>> vtxWeakPointers;
-	std::unordered_map<uint16_t, std::weak_ptr<GenericHandle>> idxWeakPointers;
+	std::unordered_map<uint64_t, std::weak_ptr<GenericHandle>> vtxWeakPointers;
+	std::unordered_map<uint64_t, std::weak_ptr<GenericHandle>> idxWeakPointers;
 	std::unordered_map<uint64_t, std::weak_ptr<GenericHandle>> meshInfoMap;
 };
