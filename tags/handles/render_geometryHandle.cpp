@@ -50,6 +50,64 @@ void render_geometryHandle::positionCompressionOffset(float vec[3]){
 	vec[2] = maxP.y;	// zmin
 }
 
+void render_geometryHandle::UVCompressionScale(float vec[2], int channel){
+	mode::render_geometry* str = (mode::render_geometry*) struct_ptr;
+
+	// probably not necessary, but just as a safety measure
+	assert(str->compression_info_ent.count != 0 && "No mesh compression info?");
+
+	point2D minP;
+	point2D maxP;
+
+	switch(channel){
+	default:
+	case 0:
+		minP = str->compression_info_ent.block->texcoord_bounds_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds_1;
+		break;
+	case 1:
+		minP = str->compression_info_ent.block->texcoord_bounds2_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds2_1;
+		break;
+	case 2:
+		minP = str->compression_info_ent.block->texcoord_bounds3_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds3_1;
+		break;
+	}
+
+	vec[0] = minP.y - minP.x;	// xmax - xmin
+	vec[1] = maxP.y - maxP.x;	// ymax - ymin
+}
+
+void render_geometryHandle::UVCompressionOffset(float vec[2], int channel){
+	mode::render_geometry* str = (mode::render_geometry*) struct_ptr;
+
+	// probably not necessary, but just as a safety measure
+	assert(str->compression_info_ent.count != 0 && "No mesh compression info?");
+
+	point2D minP;
+	point2D maxP;
+
+	switch(channel){
+	default:
+	case 0:
+		minP = str->compression_info_ent.block->texcoord_bounds_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds_1;
+		break;
+	case 1:
+		minP = str->compression_info_ent.block->texcoord_bounds2_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds2_1;
+		break;
+	case 2:
+		minP = str->compression_info_ent.block->texcoord_bounds3_0;
+		maxP = str->compression_info_ent.block->texcoord_bounds3_1;
+		break;
+	}
+
+	vec[0] = minP.x;	// xmin
+	vec[1] = maxP.x;	// ymin
+}
+
 uint16_t render_geometryHandle::getIndexBufferIndex(uint32_t meshIndex, uint32_t lod){
 	mode::render_geometry* str = (mode::render_geometry*) struct_ptr;
 

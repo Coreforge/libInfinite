@@ -52,6 +52,10 @@ public:
 
 	void positionCompressionScale(float vec[3]);
 	void positionCompressionOffset(float vec[3]);
+
+	void UVCompressionScale(float vec[2], int channel);
+	void UVCompressionOffset(float vec[2], int channel);
+
 	uint16_t getIndexBufferIndex(uint32_t meshIndex, uint32_t lod);
 	// for all 19 types of vertex buffers
 	uint16_t getVertexBufferIndex(uint32_t meshIndex, uint32_t lod, int type);
