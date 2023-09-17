@@ -2,8 +2,10 @@
 
 #include "../Tag.h"
 #include "rtgoHandle.h"
+#include "mat_Handle.h"
 
 #include <stdint.h>
+#include <vector>
 
 // for vectors
 #include <glm/glm.hpp>
@@ -19,6 +21,7 @@ struct geoInstanceInfo{
 	rtgoHandle* geo;
 	uint16_t meshIndex;
 	uint16_t mesh_flags_override;
+	std::vector<mat_Handle*> materials;
 };
 
 class sbspHandle : public Tag{

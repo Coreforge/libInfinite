@@ -1,18 +1,18 @@
 #pragma once
+
 #include "../Tag.h"
 #include "baseClasses/materialParameterBase.h"
 #include "materialParameters/bitmapParameter.h"
 #include "materialParameters/realParameter.h"
-#include "shdvHandle.h"
 
-#include <stdint.h>
 #include <memory>
+#include <stdint.h>
 
-class mat_Handle : public Tag{
+
+class shdvHandle : public Tag{
 public:
+
+	void setup();
 	uint32_t getParameterCount();
 	std::shared_ptr<materialParameterBase> getParameter(uint32_t index);
-	uint32_t getShaderGlobalId();
-	shdvHandle* getShader();
-
 };

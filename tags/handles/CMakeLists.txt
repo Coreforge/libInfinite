@@ -3,6 +3,7 @@ target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/mat_Handle.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/rtgoHandle.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/pmdfHandle.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/sbspHandle.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/shdvHandle.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/vartHandle.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/render_geometryHandle.cpp)
 

@@ -13,6 +13,7 @@
 #include "handles/rtgoHandle.h"
 #include "handles/pmdfHandle.h"
 #include "handles/sbspHandle.h"
+#include "handles/shdvHandle.h"
 #include "handles/vartHandle.h"
 
 TagManager::TagManager(ModuleManager* manager, Logger* logger){
@@ -59,6 +60,8 @@ Tag* TagManager::getTagObject(uint32_t type){
 		return new pmdfHandle();
 	case 'sbsp':
 		return new sbspHandle();
+	case 'shdv':
+		return new shdvHandle();
 	case 'mat ':
 		return new mat_Handle();
 	case 'vart':

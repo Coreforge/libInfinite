@@ -37,6 +37,11 @@ geoInstanceInfo sbspHandle::getGeoInstanceInfo(uint32_t index){
 	if(item->tagManager != nullptr){
 		Tag* tmptag = this->item->tagManager->getTag(inst->Runtime_geo_mesh_reference.globalId);
 		info.geo = dynamic_cast<rtgoHandle*>(tmptag);
+
+		for(int i = 0; i < inst->material_override_data_ent.per_Instance_Material_Block_ent.count; i++){
+			Tag* tmptag = this->item->tagManager->getTag(inst->material_override_data_ent.per_Instance_Material_Block_ent.block[i].material.globalId);
+			info.materials.emplace_back(dynamic_cast<mat_Handle*>(tmptag));
+		}
 	} else {
 		info.geo = nullptr;
 	}

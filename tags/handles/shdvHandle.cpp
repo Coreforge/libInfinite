@@ -1,24 +1,24 @@
-#include "mat_Handle.h"
-#include "../xml/generated/mat.h"
-#include "tags/TagManager.h"
+#include "shdvHandle.h"
+
+#include <tags/xml/generated/shdv.h>
+#include "baseClasses/materialParameterBase.h"
+#include "materialParameters/bitmapParameter.h"
+#include "materialParameters/realParameter.h"
 
 #include <cassert>
 
+void shdvHandle::setup(){
+	shdv* str = (shdv*)root;
 
-uint32_t mat_Handle::getParameterCount(){
-	mat_* str = (mat_*)root;
+}
+
+uint32_t shdvHandle::getParameterCount(){
+	shdv* str = (shdv*)root;
 	return str->material_parameters_ent.count;
 }
 
-shdvHandle* mat_Handle::getShader(){
-	mat_* str = (mat_*)root;
-	Tag* tmptag = this->item->tagManager->getTag(str->material_shader.globalId);
-	shdvHandle* tag = dynamic_cast<shdvHandle*>(tmptag);
-	return tag;
-}
-
-std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
-	mat_* str = (mat_*)root;
+std::shared_ptr<materialParameterBase> shdvHandle::getParameter(uint32_t index){
+	shdv* str = (shdv*)root;
 	assert(index < str->material_parameters_ent.count && "Parameter index out of bounds!");
 
 	material_parameters* paramStr = &str->material_parameters_ent.block[index];
@@ -44,9 +44,4 @@ std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
 	param->nameId = paramStr->parameter_name;
 	param->typeInt = paramStr->enum_parameter_type;
 	return param;
-}
-
-uint32_t mat_Handle::getShaderGlobalId(){
-	mat_* str = (mat_*)root;
-	return str->material_shader.globalId;
 }

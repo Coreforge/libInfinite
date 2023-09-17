@@ -10,6 +10,8 @@
   * Changes will not persist otherwise!
   */
 
+// Generated from: hirt2/shdv.xml
+
 // Flag Definitions
 
 // Field flags
@@ -40,7 +42,7 @@
 #define FLAGS_IS_FOLIAGE (1<<23)
 #define FLAGS_IS_COMPOSITED_CARD (1<<24)
 #define FLAGS_IS_LOW_RES_LIGHTING_ELIGIBLE (1<<25)
-#define FLAGS_IS_FX_SPECULAR (1<<26)
+#define FLAGS_IS_HIGH_RES_LIGHTING_ELIGIBLE (1<<26)
 #define FLAGS_IS_TWO_SIDED_SHADER (1<<27)
 #define FLAGS_DECORATOR_REQUIRES_ZPP (1<<28)
 #define FLAGS_USES_TERRAIN_SAMPLING (1<<29)
@@ -52,7 +54,8 @@
 #define COMPILER_FLAGS_VALIDATION (1<<0)
 #define COMPILER_FLAGS_DEBUG (1<<1)
 #define COMPILER_FLAGS_DEOPTIMIZE (1<<2)
-#define COMPILER_FLAGS_ITERATION (1<<3)
+#define COMPILER_FLAGS_GENERATE_PDBS (1<<3)
+#define COMPILER_FLAGS_ITERATION (1<<4)
 
 
 // Field parameter_flags
@@ -106,6 +109,8 @@ enum Output_Modifier_enum {
 
 
 
+// Structs
+
 struct shaders{
     struct tagReference shader_bytecode;
 };
@@ -126,10 +131,10 @@ struct shader_groups{
 
 
 struct function_parameters{
-    uint32_t flags_type;
+    uint32_t enum_type;
     string_id input_name;
     string_id range_name;
-    uint8_t flags_Output_Modifier;
+    uint8_t enum_Output_Modifier;
     uint8_t generated_pad8305;
     uint16_t generated_pad8305_2;
     string_id Output_Modifier_Input;
@@ -147,7 +152,7 @@ struct function_parameters{
 
 struct material_parameters{
     string_id parameter_name;
-    uint32_t flags_parameter_type;
+    uint32_t enum_parameter_type;
     struct tagReference bitmap;
     realARGBColor color;
     float real;
@@ -197,7 +202,7 @@ struct simulator_property_names{
 // Root Block
 
 struct shdv{
-    struct anon_struct_0{
+    struct AnyTag{
         uint64_t vtable_space;
         struct internal_struct{
             uint32_t global_tag_ID;
@@ -205,7 +210,7 @@ struct shdv{
         };
         struct internal_struct internal_struct_ent;
     };
-    struct anon_struct_0 anon_struct_0_ent;
+    struct AnyTag AnyTag_ent;
     uint32_t flags_flags;
     uint32_t flags_compiler_flags;
     struct tagBlock<shader_groups> shader_groups_ent;
@@ -221,9 +226,15 @@ struct shdv{
 };
 
 
+#ifdef SHDV_STRUCTURE_IMPL
 // Tag Structure (used by the loader)
 
 uint8_t shdv_structure[] {0x38,0x7,0x38,0x6,0x34,0x34,0x34,0x34,0x3B,0x3B,0xD,0xD,0x40,0x40,0x41,0x3B,0x41,0x3C,0x3C,0x3C,0x34,0x3E,0x2,0x34,0x34,0x34,0x34,0x7,0x3B,0x40,0x2,0xC,0x41,0x20,0x14,0x19,0x6,0x42,0x3D,0x3D,0x3D,0x3D,0x3D,0x3C,0x3C,0x3C,0x34,0x34,0x34,0x14,0xF,0x34,0x34,0x34,0x3E,0x3E,0x40,0xC,0x2,0x2,0xA,0x34,0x34,0x34,0x2,0x14,0x36,0x37,0x38,0x37,0x42,0x37,0x3B,0x3B,0x3D,0x3D,0x3C,0x34,0x34,0x34,0x3B,0x42,0x40,0x2,0x3B,0x40,0x2,0x3B,0x40,0x2,0x3B,0x34,0x34,0x34,0x34,0x7,0x34,0x34,0x34,0x34,0x34,0x34,0x34,0x34,0x3B};
+
+
+#else
+extern uint8_t shdv_structure[105];
+#endif
 
 
 #pragma pack(pop)
