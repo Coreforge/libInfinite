@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <string>
 #include <map>
+#include <mutex>
 
 #include "BlockTable.h"
 #include "ModuleItem.h"
@@ -44,4 +45,6 @@ public:
 	BlockTable blockTable;
 	std::map<std::string, ModuleItem*> items;
 	std::map<std::string, ModuleItem*>::iterator currentItem;
+
+	std::mutex mutex;
 };

@@ -3,8 +3,9 @@
 #include "Module.h"
 #include "oodle.h"
 #include <cstring>
-
+#include <stdio.h>
 unsigned char* ModuleItem::extractData(){
+	//printf("extracting %s\n", this->path.c_str());
 	unsigned char* data = (unsigned char*)malloc(decompressedSize);
 	uint64_t offset = dataOffset;
 	FILE* handle = module->fileHandle;
@@ -49,71 +50,74 @@ unsigned char* ModuleItem::extractData(){
 			handle = module->hd1Handle;
 		}
 	}
-	clearerr(handle);
-	if(blockCount != 0){
-		// there are multiple blocks
-		for(int b = firstBlockIndex; b < blockCount + firstBlockIndex; b++){
-			if(!module->blockTable.blocks[b]->isCompressed){
-				// not compressed, read straight into output buffer
-				fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
-				size_t i = fread((void*)(data + module->blockTable.blocks[b]->decompressedOffset),1,module->blockTable.blocks[b]->compressedSize,handle);
-				if(i != module->blockTable.blocks[b]->compressedSize){
-					// something went wrong reading
-					if(feof(handle)){
-						goto err;
+	{
+		std::lock_guard<std::mutex> lockguard(this->module->mutex);
+		clearerr(handle);
+		if(blockCount != 0){
+			// there are multiple blocks
+			for(int b = firstBlockIndex; b < blockCount + firstBlockIndex; b++){
+				if(!module->blockTable.blocks[b]->isCompressed){
+					// not compressed, read straight into output buffer
+					fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
+					size_t i = fread((void*)(data + module->blockTable.blocks[b]->decompressedOffset),1,module->blockTable.blocks[b]->compressedSize,handle);
+					if(i != module->blockTable.blocks[b]->compressedSize){
+						// something went wrong reading
+						if(feof(handle)){
+							goto err;
+						}
+						if(ferror(handle)){
+							module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
+							goto err;
+						}
+						module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
 					}
-					if(ferror(handle)){
-						module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
-						goto err;
+				} else {
+					// block is compressed, so it has to be decompressed first
+					void* block = malloc(module->blockTable.blocks[b]->compressedSize);
+					fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
+					size_t i = fread(block,1,module->blockTable.blocks[b]->compressedSize,handle);
+					if(i != module->blockTable.blocks[b]->compressedSize){
+						// something went wrong reading
+						if(feof(handle)){
+							free(block);
+							goto err;
+						}
+						if(ferror(handle)){
+							module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
+							free(block);
+							goto err;
+						}
+						module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
 					}
-					module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
+					decompress(block, module->blockTable.blocks[b]->compressedSize, data + module->blockTable.blocks[b]->decompressedOffset, module->blockTable.blocks[b]->decompressedSize);
+					free(block);
 				}
-			} else {
-				// block is compressed, so it has to be decompressed first
-				void* block = malloc(module->blockTable.blocks[b]->compressedSize);
-				fseeko64(handle,offset + module->blockTable.blocks[b]->compressedOffset,0);
-				size_t i = fread(block,1,module->blockTable.blocks[b]->compressedSize,handle);
-				if(i != module->blockTable.blocks[b]->compressedSize){
-					// something went wrong reading
-					if(feof(handle)){
-						free(block);
-						goto err;
-					}
-					if(ferror(handle)){
-						module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
-						free(block);
-						goto err;
-					}
-					module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
-				}
-				decompress(block, module->blockTable.blocks[b]->compressedSize, data + module->blockTable.blocks[b]->decompressedOffset, module->blockTable.blocks[b]->decompressedSize);
-				free(block);
 			}
-		}
-	} else {
-		// one implied block
-		void* block = malloc(compressedSize);
-		fseeko64(handle,offset,SEEK_SET);
-		size_t i = fread(block,1,compressedSize,handle);
-		if(i != compressedSize){
-			// something went wrong reading
-			if(feof(handle)){
-				free(block);
-				goto err;
-			}
-			if(ferror(handle)){
-				module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
-				free(block);
-				goto err;
-			}
-			module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
-		}
-		if(compressedSize == decompressedSize){
-			memcpy(data,block,decompressedSize);
 		} else {
-			decompress(block, compressedSize, data, decompressedSize);
+			// one implied block
+			void* block = malloc(compressedSize);
+			fseeko64(handle,offset,SEEK_SET);
+			size_t i = fread(block,1,compressedSize,handle);
+			if(i != compressedSize){
+				// something went wrong reading
+				if(feof(handle)){
+					free(block);
+					goto err;
+				}
+				if(ferror(handle)){
+					module->logger->log(LOG_LEVEL_ERROR,"An Error occured reading block data\n");
+					free(block);
+					goto err;
+				}
+				module->logger->log(LOG_LEVEL_ERROR,"Could not read enough block data. Weird.\n");
+			}
+			if(compressedSize == decompressedSize){
+				memcpy(data,block,decompressedSize);
+			} else {
+				decompress(block, compressedSize, data, decompressedSize);
+			}
+			free(block);
 		}
-		free(block);
 	}
 	return data;
 
