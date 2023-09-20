@@ -85,10 +85,10 @@ BitmapHandle::BitmapHandle(ModuleItem* moduleItem, Logger* logger){
 			//return;
 		}
 		frames.emplace_back(fr);
-		logger->log(LOG_LEVEL_DEBUG, "%d Mipmaps, Max %dx%d\n",fr.mipmapCount,fr.width,fr.height);
+		checkedlog(logger, LOG_LEVEL_DEBUG, "%d Mipmaps, Max %dx%d\n",fr.mipmapCount,fr.width,fr.height);
 	}
 
-	logger->log(LOG_LEVEL_DEBUG, "Frame count: %d\n",frameCount);
+	checkedlog(logger, LOG_LEVEL_DEBUG, "Frame count: %d\n",frameCount);
 }
 
 BitmapHandle::~BitmapHandle(){
@@ -132,7 +132,7 @@ detexTexture Frame::getDetexTexture(uint8_t level){
 
 	const detexTextureFileInfo* fInfo = detexGetFormatFromDX10Format(format);
 	if(fInfo == nullptr){
-		item->logger->log(LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
+		checkedlog(item->logger, LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
 		return tex;
 	}
 
@@ -147,7 +147,7 @@ detexTexture Frame::getDetexTexture(uint8_t level){
 
 	uint8_t* rawData = (uint8_t*)getData(level);
 	if(rawData == nullptr){
-		item->logger->log(LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
+		checkedlog(item->logger, LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
 		return tex;
 	}
 	tex.data = rawData;
@@ -171,7 +171,7 @@ void* Frame::getR8G8B8A8Data(uint8_t level){
 
 	const detexTextureFileInfo* fInfo = detexGetFormatFromDX10Format(format);
 	if(fInfo == nullptr){
-		item->logger->log(LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
+		checkedlog(item->logger, LOG_LEVEL_ERROR, "Unable to get detex Texture file Info. Please include the bitmap path and the texture format when reporting this issue\n");
 		return nullptr;
 	}
 
@@ -188,12 +188,12 @@ void* Frame::getR8G8B8A8Data(uint8_t level){
 
 	uint8_t* rawData = (uint8_t*)getData(level);
 	if(rawData == nullptr){
-		item->logger->log(LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
+		checkedlog(item->logger, LOG_LEVEL_ERROR,"Unable to get the raw bitmap data\n");
 		return nullptr;
 	}
 	tex.data = rawData;
 	if(!detexDecompressTextureLinear(&tex, dstbuf, DETEX_PIXEL_FORMAT_RGBA8)){
-		item->logger->log(LOG_LEVEL_ERROR,"There was an error while uncompressing the texture\n");
+		checkedlog(item->logger, LOG_LEVEL_ERROR,"There was an error while uncompressing the texture\n");
 	}
 	free(rawData);
 	return dstbuf;

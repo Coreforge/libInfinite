@@ -48,3 +48,13 @@ mat_Handle* modeHandle::getMaterial(uint32_t index){
  	return dynamic_cast<mat_Handle*>(tag);
 
 }
+
+std::vector<mat_Handle*> modeHandle::getMaterials(){
+	mode* str = (mode*)root;
+	std::vector<mat_Handle*> mats;
+	mats.resize(str->materials_ent.count);
+	for(int i = 0; i < str->materials_ent.count; i++){
+		mats[i] = getMaterial(i);
+	}
+	return mats;
+}

@@ -30,17 +30,17 @@ Item::Item(uint8_t* data, uint32_t length, Logger* logger, std::string name, std
 	int r = this->header.parseHeader(this->data);
 
 	if(r != ERROR_NONE){
-		logger->log(LOG_LEVEL_ERROR,"Could not parse Header!\n");
+		checkedlog(logger, LOG_LEVEL_ERROR,"Could not parse Header!\n");
 		return;
 	}
 
 	r = dataTable.readTable(data + header.dataTableOffset, header.dataTableCount);
 
 	if(DUMP_DATA_TABLE){
-		logger->log(LOG_LEVEL_DEBUG,"\n\n\n");
-		logger->log(LOG_LEVEL_DEBUG,"Data Table:\nSize\tRegion\tOffset\n");
+		checkedlog(logger, LOG_LEVEL_DEBUG,"\n\n\n");
+		checkedlog(logger, LOG_LEVEL_DEBUG,"Data Table:\nSize\tRegion\tOffset\n");
 		for(int i = 0; i < dataTable.entries.size(); i++){
-			logger->log(LOG_LEVEL_DEBUG,"0x%x\t0x%x\t0x%x\t\n",dataTable.entries[i].size,dataTable.entries[i].region,dataTable.entries[i].offset);
+			checkedlog(logger, LOG_LEVEL_DEBUG,"0x%x\t0x%x\t0x%x\t\n",dataTable.entries[i].size,dataTable.entries[i].region,dataTable.entries[i].offset);
 		}
 	}
 
@@ -58,22 +58,22 @@ Item::Item(uint8_t* data, uint32_t length, Logger* logger, std::string name, std
 		}
 	}
 	if(DUMP_CONTENT_TABLE){
-		logger->log(LOG_LEVEL_DEBUG,"Type\t\tRef\tParent\n");
+		checkedlog(logger, LOG_LEVEL_DEBUG,"Type\t\tRef\tParent\n");
 		for(int i = 0; i < contentTable.entries.size(); i++){
-			logger->log(LOG_LEVEL_DEBUG,"0x%llx %#llx\t%#x\t%#x\n",contentTable.entries[i].type.data[0],contentTable.entries[i].type.data[1],contentTable.entries[i].ref,contentTable.entries[i].parent);
+			checkedlog(logger, LOG_LEVEL_DEBUG,"0x%llx %#llx\t%#x\t%#x\n",contentTable.entries[i].type.data[0],contentTable.entries[i].type.data[1],contentTable.entries[i].ref,contentTable.entries[i].parent);
 		}
 	}
 	bool stillHasPaths = moduleItem->module->version < 0x35;
 	r = tagRefFieldTable.readStrings(data + header.stringTableOffset, header.stringCount, header.stringLength, data + header.stringDataOffset,stillHasPaths);
 
 	if(DUMP_STRING_TABLE){
-		logger->log(LOG_LEVEL_DEBUG,"Valid Strings\n");
+		checkedlog(logger, LOG_LEVEL_DEBUG,"Valid Strings\n");
 		for(int i = 0; i < tagRefFieldTable.strings.size(); i++){
-			logger->log(LOG_LEVEL_DEBUG,"%s\n",tagRefFieldTable.strings[i].string.c_str());
+			checkedlog(logger, LOG_LEVEL_DEBUG,"%s\n",tagRefFieldTable.strings[i].string.c_str());
 		}
-		logger->log(LOG_LEVEL_DEBUG,"Invalid Strings\n");
+		checkedlog(logger, LOG_LEVEL_DEBUG,"Invalid Strings\n");
 		for(int i = 0; i < tagRefFieldTable.invalidStrings.size(); i++){
-			logger->log(LOG_LEVEL_DEBUG,"%s\n",tagRefFieldTable.invalidStrings[i].string.c_str());
+			checkedlog(logger, LOG_LEVEL_DEBUG,"%s\n",tagRefFieldTable.invalidStrings[i].string.c_str());
 		}
 	}
 
@@ -81,12 +81,12 @@ Item::Item(uint8_t* data, uint32_t length, Logger* logger, std::string name, std
 
 	r = dataRefTable.readTable(data + header.dataReferenceTableOffset, header.dataReferenceTableCount);
 
-	logger->log(LOG_LEVEL_DEBUG, "Data Offset: 0x%lx, Data2 Offset: 0x%lx\n",this->header.dataOffset,this->header.data2Offset);
+	checkedlog(logger, LOG_LEVEL_DEBUG, "Data Offset: 0x%lx, Data2 Offset: 0x%lx\n",this->header.dataOffset,this->header.data2Offset);
 }
 
 Item::~Item(){
 	free(data);
-	printf("deleting Item\n");
+	//printf("deleting Item\n");
 }
 
 void* Item::getDataBlock(DataTableEntry* entry){

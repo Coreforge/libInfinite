@@ -19,6 +19,11 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex)
 target_link_libraries(Infinite detex)
 target_include_directories(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/3rd_party/detex)
 
+find_package(PNG REQUIRED)
+target_link_libraries(Infinite ${PNG_LIBRARIES})
+find_package(jsoncpp REQUIRED)
+target_link_libraries(Infinite jsoncpp)
+
 if(NOT DEFINED OODLE_LIBRARY)
 	set(OODLE_LIBRARY ${CMAKE_CURRENT_LIST_DIR}/liblinoodle.so)
 endif()
@@ -39,6 +44,8 @@ target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Header.cpp ${CMAKE_CUR
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/DataRefTable.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/BitmapHandle.cpp
 								${CMAKE_CURRENT_LIST_DIR}/contentUtils.cpp
+								${CMAKE_CURRENT_LIST_DIR}/BitmapBatchExtractor.cpp
+								${CMAKE_CURRENT_LIST_DIR}/MaterialJsonExporter.cpp								
 								${CMAKE_CURRENT_LIST_DIR}/StringIDLUT.cpp)
 
 include(${CMAKE_CURRENT_LIST_DIR}/module/CMakeLists.txt)

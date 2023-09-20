@@ -21,7 +21,7 @@ public:
 	uint32_t nameId;
 	int typeInt = -1;
 
-	materialParameterBase();
+	materialParameterBase(int type = TYPE_INVALID);
 	virtual std::string toString();
 	virtual std::string getTypeString();
 	virtual ~materialParameterBase() = default;

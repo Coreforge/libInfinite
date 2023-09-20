@@ -17,6 +17,36 @@ shdvHandle* mat_Handle::getShader(){
 	return tag;
 }
 
+std::unordered_map<string_id,std::shared_ptr<materialParameterBase>> mat_Handle::getParameters(){
+	mat_* str = (mat_*)root;
+	std::unordered_map<string_id,std::shared_ptr<materialParameterBase>> mergedParams;
+
+	// first add the params from the shader, then apply any specified by the material
+
+	auto shader = getShader();
+	for(int i = 0; i < shader->getParameterCount(); i++){
+		auto param = shader->getParameter(i);
+		if(param->typeInt == materialParameterBase::TYPE_BITMAP){
+			// fix up the bitmap global ID
+			auto bitmparam = std::dynamic_pointer_cast<bitmapParameter>(param);
+			if(bitmparam.get() != nullptr && str->postprocess_definition_ent.count != 0){
+				if(bitmparam->registerOffset < str->postprocess_definition_ent.block[0].textures_ent.count){
+					bitmparam->globalId = str->postprocess_definition_ent.block[0].textures_ent.block[bitmparam->registerOffset].bitmap_reference.globalId;
+				}
+			}
+		}
+		mergedParams[param->nameId] = param;
+	}
+
+	// go through the material's parameters
+	for(int i = 0; i < getParameterCount(); i++){
+		auto param = getParameter(i);
+		mergedParams[param->nameId] = param;	// this will overwrite any parameters already specified by the shader
+	}
+
+	return mergedParams;
+}
+
 std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
 	mat_* str = (mat_*)root;
 	assert(index < str->material_parameters_ent.count && "Parameter index out of bounds!");
@@ -27,7 +57,7 @@ std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
 	switch(paramStr->enum_parameter_type){
 	case PARAMETER_TYPE_BITMAP:
 	{
-		std::shared_ptr<bitmapParameter> btmParam = std::make_shared<bitmapParameter>(paramStr->bitmap.globalId);
+		std::shared_ptr<bitmapParameter> btmParam = std::make_shared<bitmapParameter>(paramStr->bitmap.globalId, paramStr->register_offset);
 		param = btmParam;
 	}
 		break;
@@ -37,8 +67,40 @@ std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
 		param = realParam;
 	}
 		break;
+	case PARAMETER_TYPE_INT:
+	{
+		std::shared_ptr<intParameter> intParam = std::make_shared<intParameter>(paramStr->int_bool);
+		param = intParam;
+	}
+		break;
+	case PARAMETER_TYPE_BOOL:
+	{
+		std::shared_ptr<boolParameter> boolParam = std::make_shared<boolParameter>(paramStr->int_bool);
+		param = boolParam;
+	}
+		break;
+	case PARAMETER_TYPE_STRING:
+	{
+		int count = paramStr->string.size;
+		if(count != 0) count -= 1;	// otherwise, null terminator gets included
+		std::shared_ptr<stringParameter> stringParam = std::make_shared<stringParameter>(std::string((const char*)paramStr->string.data, count));
+		param = stringParam;
+	}
+		break;
+	case PARAMETER_TYPE_PRESET:
+	{
+		std::shared_ptr<presetParameter> presetParam = std::make_shared<presetParameter>(paramStr->bitmap.globalId);
+		param = presetParam;
+	}
+		break;
+	case PARAMETER_TYPE_COLOR:
+	{
+		std::shared_ptr<colorParameter> colorParam = std::make_shared<colorParameter>(paramStr->color.r, paramStr->color.g, paramStr->color.b, paramStr->color.a);
+		param = colorParam;
+	}
+		break;
 	default:
-		param = std::make_shared<materialParameterBase>();
+		param = std::make_shared<materialParameterBase>(paramStr->enum_parameter_type);
 		break;
 	}
 	param->nameId = paramStr->parameter_name;

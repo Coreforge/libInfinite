@@ -4,15 +4,13 @@
 #include <string>
 #include <stdint.h>
 
-class bitmapParameter : public materialParameterBase{
+class intParameter : public materialParameterBase{
 public:
 
 
-	uint32_t globalId;
-	uint32_t tagClass;
-	uint32_t registerOffset;
+	uint32_t value;
 
-	bitmapParameter(uint32_t globalId, uint32_t registerOffset = 0);
+	intParameter(uint32_t value);
 	std::string toString() override;
 	std::string getTypeString() override;
 };

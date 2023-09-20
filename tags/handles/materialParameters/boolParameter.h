@@ -4,15 +4,13 @@
 #include <string>
 #include <stdint.h>
 
-class bitmapParameter : public materialParameterBase{
+class boolParameter : public materialParameterBase{
 public:
 
 
-	uint32_t globalId;
-	uint32_t tagClass;
-	uint32_t registerOffset;
+	bool value;
 
-	bitmapParameter(uint32_t globalId, uint32_t registerOffset = 0);
+	boolParameter(bool value);
 	std::string toString() override;
 	std::string getTypeString() override;
 };

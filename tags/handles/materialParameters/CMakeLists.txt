@@ -1,2 +1,7 @@
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/bitmapParameter.cpp)
 target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/realParameter.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/intParameter.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/colorParameter.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/boolParameter.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/stringParameter.cpp)
+target_sources(Infinite PRIVATE ${CMAKE_CURRENT_LIST_DIR}/presetParameter.cpp)

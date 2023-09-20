@@ -1,12 +1,17 @@
 #include "materialParameterBase.h"
 
-materialParameterBase::materialParameterBase(){
+#include <sstream>
+
+materialParameterBase::materialParameterBase(int type){
 	nameId = 0;
-	parameterType = parameterType::TYPE_INVALID;
+	parameterType = TYPE_INVALID;
+	typeInt = type;
 }
 
 std::string materialParameterBase::toString(){
-	return std::string("Invalid Parameter type");
+	std::stringstream sstream;
+	sstream << "Invalid Parameter type (" << typeInt << ")";
+	return sstream.str();
 }
 
 std::string materialParameterBase::getTypeString(){

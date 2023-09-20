@@ -7,6 +7,8 @@
 #define LOG_LEVEL_ERROR 4
 #define LOG_LEVEL_CRITICAL 5
 
+#define checkedlog(logger, level, ...) if(logger != nullptr) logger->log(level,  __VA_ARGS__);
+
 class Logger{
 public:
 	//virtual Logger() = 0;
