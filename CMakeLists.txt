@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(Infinite VERSION 0.1.0)
 
+option(DOWNLOAD_PNGPP "Download libpng++ 2.10 from launchpad" OFF)
+
 # ASAN options
 if(OFF)
 	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fsanitize=address PARENT_SCOPE)
@@ -23,6 +25,19 @@ find_package(PNG REQUIRED)
 target_link_libraries(Infinite ${PNG_LIBRARIES})
 find_package(jsoncpp REQUIRED)
 target_link_libraries(Infinite jsoncpp)
+get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "JSON include path: ${JSON_INC_PATH}")
+target_include_directories(Infinite PRIVATE ${JSON_INC_PATH})
+
+# libpng++ is also needed, but not available in msys2
+if(DOWNLOAD_PNGPP)
+	include(ExternalProject)
+	message(STATUS "Downloading libpng++ 2.10 from launchpad")
+	ExternalProject_Add(png++ URL "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/png++/0.2.10-1/png++_0.2.10.orig.tar.gz" LOG_DOWNLOAD ON CONFIGURE_COMMAND "" BUILD_COMMAND "" INSTALL_COMMAND "" SOURCE_DIR "include-png++/png++")
+	add_dependencies(Infinite png++)
+	message(STATUS "PNG++ include dir: ${CMAKE_CURRENT_BINARY_DIR}/include-png++/")
+	target_include_directories(Infinite PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/include-png++/")
+endif()
 
 if(NOT DEFINED OODLE_LIBRARY)
 	set(OODLE_LIBRARY ${CMAKE_CURRENT_LIST_DIR}/liblinoodle.so)

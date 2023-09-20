@@ -1,6 +1,10 @@
 #pragma once
-
+#ifdef _WIN64
+// msys2 mingw64 has a different path for some reason
+#include <json/json.h>
+#else
 #include <jsoncpp/json/json.h>
+#endif
 
 #include <vector>
 #include <unordered_set>

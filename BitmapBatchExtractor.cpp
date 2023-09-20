@@ -1,5 +1,9 @@
 #include "BitmapBatchExtractor.h"
 
+// from https://dev.gnupg.org/T4539
+#ifdef _WIN64
+#define strerror_r(errnum, buf, buflen) strerror_s(buf, buflen, errnum)
+#endif
 #include <png++/png.hpp>
 #include <thread>
 
@@ -53,7 +57,7 @@ void BitmapBatchExtractor::extract(std::string path, std::vector<uint32_t> bitma
 					// give the work to this one
 					workerControls[threadcounter].globalId = globalId;
 					std::stringstream stream;
-					stream << path << "/" << std::hex << std::setw(8) << std::setfill('0') << globalId << ".png";	// only png for now
+					stream << path << "/" << std::hex << std::setw(8) << std::setfill('0') << globalId;	// only png for now
 					workerControls[threadcounter].path = stream.str();
 
 					workerControls[threadcounter].status = bitmapWorkerControl::WORKER_NEW_WORK;	// all parameters have been set
@@ -124,7 +128,7 @@ void BitmapBatchExtractor::bitmapWorkerLoop(ModuleManager* modman, bitmapWorkerC
 					}
 				}
 
-				pngimg.write(idx == 0 ? control->path : control->path + "_" + std::to_string(idx));
+				pngimg.write((idx == 0 ? control->path : control->path + "_" + std::to_string(idx)) + ".png");
 
 				/*if(!stbi_write_png(control->path.c_str(), bitmapHandle.frames[idx].mipMaps[lvl].width, bitmapHandle.frames[idx].mipMaps[lvl].height,
 						4, data, bitmapHandle.frames[idx].mipMaps[lvl].width * 4)){
