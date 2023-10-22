@@ -139,6 +139,7 @@ bufferInfo render_geometryHandle::getVertexBuffer(uint16_t index){
 	ret.count = buf->count;
 	ret.stride = buf->stride;
 	ret.size = buf->d3dbuffer_ent.byte_width;
+	ret.dataType = buf->enum_format;
 	if(buf->d3dbuffer_ent.d3d_buffer.size == 0){
 		// in a separate resource file (at least mode and rtgo)
 		ret.data = tag->getResource(buf->offset, buf->d3dbuffer_ent.byte_width);

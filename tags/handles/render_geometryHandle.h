@@ -18,6 +18,7 @@ struct bufferInfo{
 	uint32_t count;
 	uint32_t stride;
 	uint32_t size;
+	uint32_t dataType;
 	void* data;
 };
 
