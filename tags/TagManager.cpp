@@ -15,6 +15,7 @@
 #include "handles/sbspHandle.h"
 #include "handles/shdvHandle.h"
 #include "handles/vartHandle.h"
+#include "handles/levlHandle.h"
 
 TagManager::TagManager(ModuleManager* manager, Logger* logger){
 	this->man = manager;
@@ -29,12 +30,20 @@ int TagManager::addTag(uint32_t globalId){
 		logger->log(LOG_LEVEL_ERROR, "Error: Could not find the Tag with the Global ID 0x%08x. Maybe some required modules aren't loaded?\n",globalId);
 		return -1;
 	}
+
 	ModuleItem* itm;
 	itm = man->assetIdItems[globalId];
 	return addTag(itm);
 }
 
 Tag* TagManager::getTag(uint32_t globalId){
+
+	if(loadingTags.contains(globalId)){
+		// this can cause crashes, depending on what's being done inside the setup function of the tags (currently unlikely)
+		char* tagType = (char*)&loadingTags[globalId]->item->moduleItem->tagType;
+		logger->log(LOG_LEVEL_WARNING, "Tag dependency loop detected! Global Id 0x%08x (%c%c%c%c) is still being loaded, but required by another tag.\n",globalId, tagType[3], tagType[2], tagType[1], tagType[0]);
+	}
+
 	if(loadedTags.count(globalId) > 0){
 		loadedTags[globalId]->uses++;
 		//printf("Tag already loaded\n");
@@ -66,6 +75,8 @@ Tag* TagManager::getTagObject(uint32_t type){
 		return new mat_Handle();
 	case 'vart':
 		return new vartHandle();
+	case 'levl':
+		return new levlHandle();
 	default:
 		return new Tag();
 	}
@@ -93,8 +104,13 @@ int TagManager::addTag(ModuleItem* itm){
 	sbsp* bsp;
 	void* struct_ptr;
 
-	loader.loadTag(item, struct_ptr, nullptr, 0, true, this, tag);
+	// inserting it before loading means that in case of a dependency loop, it can still be referenced by the loader
+	tag->item = item;
+	loadingTags.insert({item->moduleItem->assetID,tag});
+	loadedTags.insert({item->moduleItem->assetID,tag});
 
+	loader.loadTag(item, struct_ptr, nullptr, 0, true, this, tag);
+	loadingTags.erase(item->moduleItem->assetID);
 	// giant switch for all tag classes
 	// this is ugly, but I'm not sure if there really is a better way to do it
 	switch(itm->tagType){
@@ -132,12 +148,10 @@ int TagManager::addTag(ModuleItem* itm){
 		return -1;
 	}*/
 
-	tag->item = item;
 	item->tagManager = this;
 	tag->root = struct_ptr;
 	tag->uses  = 1;
 	tag->setup();	// not used by the base tag, but some handles need it
-	loadedTags.insert({item->moduleItem->assetID,tag});
 
 	return 0;
 }

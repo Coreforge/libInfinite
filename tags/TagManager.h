@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <map>
+#include <unordered_map>
 
 class TagManager{
 public:
@@ -23,5 +24,7 @@ public:
 
 private:
 	Tag* getTagObject(uint32_t type);
+
+	std::unordered_map<uint32_t, Tag*> loadingTags;	// to detect dependency loops.
 
 };

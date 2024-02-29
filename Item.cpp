@@ -81,7 +81,7 @@ Item::Item(uint8_t* data, uint32_t length, Logger* logger, std::string name, std
 
 	r = dataRefTable.readTable(data + header.dataReferenceTableOffset, header.dataReferenceTableCount);
 
-	checkedlog(logger, LOG_LEVEL_DEBUG, "Data Offset: 0x%lx, Data2 Offset: 0x%lx\n",this->header.dataOffset,this->header.data2Offset);
+	//checkedlog(logger, LOG_LEVEL_DEBUG, "Data Offset: 0x%lx, Data2 Offset: 0x%lx\n",this->header.dataOffset,this->header.data2Offset);
 }
 
 Item::~Item(){

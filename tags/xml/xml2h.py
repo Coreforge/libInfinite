@@ -43,7 +43,7 @@ endcode = '''#pragma pack(pop)
 class tagStructParser:
 
     anoncount = 0   # anonymous (unnamed) structs will be named sequentially
-
+    unnamedCount = 0    # unnamed fields will also be named sequentially
     # needed for format strings, they don't work otherwise
     sqOpen = '{'
     sqClose = '}'
@@ -69,11 +69,20 @@ class tagStructParser:
 
     def cleanNames(self, name : str):
         cleaned = name.replace(" ", "_").replace("/","_").replace("(","").replace(")","").replace("[","").replace("]","").replace(".","").replace("'","")
-        cleaned = cleaned.replace("-","_")
+        cleaned = cleaned.replace("-","_").replace(",","").replace("%","percent").replace(">","gt").replace("<","lt").replace("+","plus")
+
+        if len(cleaned) == 0:
+            cleaned = f"unnamed_field_{self.unnamedCount}"
+            self.unnamedCount += 1
 
         # also replace reserverd keywords
         if cleaned == "register":
             cleaned = "register_field"
+        if cleaned == "template":
+            cleaned = "template_field"
+
+        if cleaned[0].isnumeric():
+            cleaned = "num" + cleaned
         return cleaned
 
 
@@ -95,6 +104,38 @@ class tagStructParser:
                 continue
             self.knownFlags.append(f"{name}_{x}")
             return f"{name}_{x}"
+        
+    # returns the name that would actually get used by this entry, and whether it generates actual code or just a comment
+    # (some of the CUSTOM entries otherwise trip the double field name logic)
+    # As long as this function only gets used when checking for duplicates, ignoring types where duplicates are already avoided should be fine
+    # if I end up using this for something else as well, I'll have to change that (probably best to store the new name in the etree then, and maybe have a renaming pass first)
+    def getUsedName(self, eType, element, indentLevel,isArray = False, arrayCount = 0) -> (str,bool):
+        fieldName = self.cleanNames(element.attrib["v"])
+        if eType == "_39":
+            # Array name
+            return self.getUsedName(element[0].tag, element[0], 0)
+        
+        if eType == "_3B":
+            return ("",False)
+        
+        if eType == "_D" or eType == "_E" or eType == "_F":
+            # for flags, duplicate names are already taken care of
+            # returning false then disables the code that would otherwise handle duplicate field names
+            return ("flagstuff, this shouldn't end up in generated code", False)
+        if eType == "_A" or eType == "_B" or eType == "_C":
+            # same goes for enums
+            return ("enum, this shouldn't end up in generated code either!", False)
+        
+        if eType == "_36":
+            # Explanation
+            return (fieldName, False)
+        if eType == "_37":
+            # Comment
+            return (fieldName, False)
+        if eType == "_43":
+            return (f"{fieldName}_res", True)
+        
+        return (fieldName, True)
 
     # process an XML Entry. Returns the code to put at that place, 
     # either just for the field, or a pointer to a struct or other.
@@ -108,6 +149,9 @@ class tagStructParser:
         self.typeMapSize += 1
         if eType == "_34":
             return self.parsePadding(element,indentLevel)
+        
+        if eType == "_35":
+            return self.parseSkip(element,indentLevel)
         
         if eType == "_3B":
             # this just marks the end of a struct, which isn't needed with the XMLs,
@@ -157,8 +201,8 @@ class tagStructParser:
         fieldName = self.TypePrefix + self.cleanNames(element.attrib["v"])
 
         # add the enum definition
-        if not fieldName in self.knownEnums or addDuplicateEnumNames:
-            self.knownEnums.append(fieldName)
+        if not fieldName.lower() in self.knownEnums or addDuplicateEnumNames:
+            self.knownEnums.append(fieldName.lower())
             self.enumDefinitions += f"// Enum {fieldName}\n\nenum {fieldName}_enum {self.sqOpen}\n"
             x = 0
             knownEnumFlags = {}
@@ -195,7 +239,12 @@ class tagStructParser:
             count = len(element) // 2
         self.typeMap += f"{count:#0{6}x},"
         self.typeMapSize += 2
-        return f"// Array with {str(count)} elements\n" + self.handleEntry(element[0].tag, element[0],indentLevel,True,count)
+        # Using the v attribute of the array (_39) tag for the array name might make more sense, but switching that now would almost certainly break things now
+        # it's also not always available
+        arrayName = ""
+        if "v" in element.attrib.keys():
+            arrayName = f"\"{element.attrib['v']}\" "
+        return f"// Array {arrayName}with {str(count)} elements\n" + self.handleEntry(element[0].tag, element[0],indentLevel,True,count)
 
     def parseField(self, eType, element, indentLevel, isArray = False, arrayCount = 0):
         indentString = "".join([self.indent for x in range(indentLevel)])
@@ -235,6 +284,15 @@ class tagStructParser:
         if eType == "_A" or eType == "_B" or eType == "_C":
             return self.parseEnum(eType,element,indentLevel)
 
+        if eType == "_10":
+            return f"{indentString}struct shortPoint2D {fieldName}{arrayString};\n"
+
+        if eType == "_12":
+            return f"{indentString}rgbColor {fieldName}{arrayString};\n"
+        
+        if eType == "_13":
+            return f"{indentString}argbColor {fieldName}{arrayString};\n"
+
         if eType == "_14":
             return f"{indentString}float {fieldName}{arrayString};\n"
 
@@ -256,6 +314,9 @@ class tagStructParser:
         if eType == "_1A":
             return f"{indentString}realQuaternion {fieldName}{arrayString};\n"
 
+        if eType == "_1B":
+            return f"{indentString}realEulerAngle2D {fieldName}{arrayString};\n"
+
         if eType == "_1C":
             return f"{indentString}realEulerAngle3D {fieldName}{arrayString};\n"
 
@@ -271,11 +332,20 @@ class tagStructParser:
         if eType == "_20":
             return f"{indentString}realARGBColor {fieldName}{arrayString};\n"
 
+        if eType == "_23":
+            return f"{indentString}shortBounds {fieldName}{arrayString};\n"
+
         if eType == "_25":
             return f"{indentString}realBounds {fieldName}{arrayString};\n"
 
+        if eType == "_26":
+            return f"{indentString}realFractionBounds {fieldName}{arrayString};\n"
+
         if eType == "_2E":
             return f"{indentString}shortBlockIndex {fieldName}{arrayString};\n"
+        
+        if eType == "_2F":
+            return f"{indentString}customShortBlockIndex {fieldName}{arrayString};\n"
 
         if eType == "_30":
             return f"{indentString}longBlockIndex {fieldName}{arrayString};\n"
@@ -323,13 +393,17 @@ class tagStructParser:
         if eType == "_44":
             return f"{indentString}uint32_t unknown_type_44_{fieldName}{arrayString};\n"
 
-        return f"{indentString}//Unhandled type {eType}{arrayString}\n"
+        return f"{indentString}#error Unhandled type {eType}{arrayString}\n"
 
 
     def parsePadding(self, element, indentLevel):
         indentString = "".join([self.indent for x in range(indentLevel)])
         fieldName = self.cleanNames(element.attrib["v"])
-        length = int(element.attrib["length"])
+        length = 0
+        if "length" in element.attrib.keys():
+            length = int(element.attrib["length"])
+        elif "s" in element.attrib:
+            length = int(element.attrib["s"])
 
         # one entry in the typeMap string has already been made, but the C++ loader counts 0x34 as one byte padding, since also storing size is more complicated than just doing this
         if(length == 4):
@@ -354,7 +428,34 @@ class tagStructParser:
             self.typeMap += f"0x34,0x34,0x34,0x34,0x34,0x34,"
             self.typeMapSize += 6
             return f"{indentString}uint32_t {fieldName};\n{indentString}uint16_t {fieldName}_2;\n{indentString}uint8_t {fieldName}_3;\n"
-        return f"{indentString}// WARNING: PADDING {str(length)} bytes\n"
+        if(length == 8):
+            self.typeMap += f"0x34,0x34,0x34,0x34,0x34,0x34,0x34,"
+            self.typeMapSize += 7
+            return f"{indentString}uint64_t {fieldName};\n"
+        return f"{indentString}#warning PADDING {str(length)} bytes\n"
+
+    def parseSkip(self, element, indentLevel):
+        indentString = "".join([self.indent for x in range(indentLevel)])
+        fieldName = self.cleanNames(element.attrib["v"])
+        length = 0
+        if "length" in element.attrib.keys():
+            length = int(element.attrib["length"])
+        elif "s" in element.attrib:
+            length = int(element.attrib["s"])
+
+        if length == 0:
+            print(f"Error: skip {fieldName} has length {length}", file=sys.stderr)
+            return f"#warning see stderr of codegen ({fieldName})"
+        
+        cnt = 0
+        code = f"{indentString}// Skip with length {length}\n"
+        # I'm not adding stuff to the type map here, as I don't actually use that in the loader anymore
+        if length >= 4:
+            code += f"{indentString}uint32_t {fieldName}[{length//4}];\n"
+        
+        if length%4 != 0:
+            code += f"{indentString}uint8_t {fieldName}_c[{length%4}];\n"
+        return code
 
 
     # field_block_v2
@@ -415,8 +516,25 @@ class tagStructParser:
             addStruct = False
         else:
             self.knownStructs[structname] = [0,[]]
-
+        knownFields = []
         for child in structElement:
+            # prevent duplicate names in the same struct. Those would cause problems
+            #childName = self.cleanNames(child.attrib["v"]).lower()
+            childName, isRelevant = self.getUsedName(child.tag,child, 0)
+            childName = childName.lower()
+            if isRelevant:
+                if childName in knownFields:
+                    cnt = 2
+                    while f"{childName}_{cnt}" in knownFields:
+                        cnt += 1
+                    if child.tag == "_39":
+                        child[0].attrib["v"] = f"{childName}_{cnt}"
+                    else:
+                        child.attrib["v"] = f"{childName}_{cnt}"
+                    print(f"Using \"{childName}_{cnt}\" as field name to avoid duplicate names", file=sys.stderr)
+                    childName = f"{childName}_{cnt}"
+                knownFields.append(childName)
+
             code += self.handleEntry(child.tag,child,indentLevel + 1)
             #self.knownStructs[structname][1].append(child.tag)
             pass

@@ -42,7 +42,10 @@ struct tagReference{
     void* TypeInfo;  // CAUTION: the loader puts the pointer to the root struct of the referenced tag here
     uint32_t globalId;
     uint64_t assetId;
+    union{
     uint32_t tagClass;
+    char tagClassc[4];
+    };
     uint32_t localHandle;  
     
 };
@@ -59,6 +62,22 @@ struct externalResource{
                         // when ther isn't really enough space without overwriting unknown, which could turn out to be important)
     uint32_t unknown;
 };
+
+// _10
+struct shortPoint2D{
+    uint16_t x;
+    uint16_t y;
+};
+
+// _12 (maybe? maybe also mmr3hash)
+typedef struct rgbColor{
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+	uint8_t a;	// unused I guess
+} rgbColor;
+
+typedef rgbColor argbColor;	// same thing
 
 // _16
 struct point2D{
@@ -117,6 +136,12 @@ struct realQuaternion{
     float w;
 };
 
+// _1B
+typedef struct realEulerAngle2D{
+    float x;
+    float y;
+} realEulerAngles2D;
+
 // _1C
 typedef struct realEulerAngle3D realEulerAngle3D;
 
@@ -144,6 +169,11 @@ struct realPlane3D{
     float d;
 };
 
+// _23
+typedef struct shortBounds{
+    uint16_t min;
+    uint16_t max;
+} shortBounds;
 
 // _25
 typedef struct realBounds realBounds;
@@ -153,11 +183,18 @@ struct realBounds{
     float max;
 };
 
+// _26
+// probably not really right
+typedef struct realBounds realFractionBounds;
+
 // _8
 typedef float angle;
 
 // _2E
 typedef uint16_t shortBlockIndex;
+
+// _2F
+typedef uint16_t customShortBlockIndex;
 
 // _30
 typedef uint32_t longBlockIndex;
