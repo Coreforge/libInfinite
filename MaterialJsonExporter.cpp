@@ -68,6 +68,19 @@ Json::Value MaterialJsonExtractor::toJson(mat_Handle* mat){
 			break;
 		}
 	}
+	if(mat->getStyleInfoCount()){
+		mat_Handle::StyleInfo si = mat->getStyleInfo(0);
+		jsonMatNode["region_name"] = idLUT.lookupID(si.region_name);
+		jsonMatNode["base_intention"] = idLUT.lookupID(si.base_intention);
+		jsonMatNode["mask_0_red_channel_intention"] = idLUT.lookupID(si.mask_0_red_channel_intention);
+		jsonMatNode["mask_0_green_channel_intention"] = idLUT.lookupID(si.mask_0_green_channel_intention);
+		jsonMatNode["mask_0_blue_channel_intention"] = idLUT.lookupID(si.mask_0_blue_channel_intention);
+		jsonMatNode["mask_1_red_channel_intention"] = idLUT.lookupID(si.mask_1_red_channel_intention);
+		jsonMatNode["mask_1_green_channel_intention"] = idLUT.lookupID(si.mask_1_green_channel_intention);
+		jsonMatNode["mask_1_blue_channel_intention"] = idLUT.lookupID(si.mask_1_blue_channel_intention);
+		jsonMatNode["num_supported_layers"] = si.numSupportedLayers;
+
+	}
 
 	return jsonMatNode;
 }

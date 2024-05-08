@@ -10,7 +10,7 @@
   * Changes will not persist otherwise!
   */
 
-// Generated from: hirt/mwsy.xml
+// Generated from: hirt3/mwsy.xml
 
 // Flag Definitions
 
@@ -137,7 +137,7 @@ struct Preloaded_Swatches{
 // Root Block
 
 struct mwsy{
-    struct anon_struct_0{
+    struct AnyTag{
         uint64_t vtable_space;
         struct internal_struct{
             uint32_t global_tag_ID;
@@ -145,7 +145,7 @@ struct mwsy{
         };
         struct internal_struct internal_struct_ent;
     };
-    struct anon_struct_0 anon_struct_0_ent;
+    struct AnyTag AnyTag_ent;
     struct tagBlock<regions> regions_ent;
     uint32_t regions_Flags;
     uint32_t regions_Vector1;

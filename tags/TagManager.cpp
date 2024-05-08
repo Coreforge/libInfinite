@@ -16,6 +16,9 @@
 #include "handles/shdvHandle.h"
 #include "handles/vartHandle.h"
 #include "handles/levlHandle.h"
+#include "handles/mwsyHandle.h"
+#include "handles/cwmsHandle.h"
+#include "handles/cmswHandle.h"
 
 TagManager::TagManager(ModuleManager* manager, Logger* logger){
 	this->man = manager;
@@ -77,6 +80,12 @@ Tag* TagManager::getTagObject(uint32_t type){
 		return new vartHandle();
 	case 'levl':
 		return new levlHandle();
+	case 'mwsy':
+		return new mwsyHandle();
+	case 'cwms':
+		return new cwmsHandle();
+	case 'cmsw':
+		return new cmswHandle();
 	default:
 		return new Tag();
 	}

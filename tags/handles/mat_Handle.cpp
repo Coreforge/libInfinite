@@ -108,6 +108,45 @@ std::shared_ptr<materialParameterBase> mat_Handle::getParameter(uint32_t index){
 	return param;
 }
 
+uint32_t mat_Handle::getStyleInfoCount(){
+	mat_* str = (mat_*)root;
+	return str->style_info_ent.count;
+}
+
+mat_Handle::StyleInfo mat_Handle::getStyleInfo(uint32_t index){
+	mat_* str = (mat_*)root;
+	assert(index < str->style_info_ent.count && "Style info index out of bounds!");
+	StyleInfo info;
+	style_info* si = &str->style_info_ent.block[index];
+	info.region_name = si->region_name;
+	info.base_intention = si->base_intention;
+	info.mask_0_red_channel_intention = si->mask_0_red_channel_intention;
+	info.mask_0_green_channel_intention = si->mask_0_green_channel_intention;
+	info.mask_0_blue_channel_intention = si->mask_0_blue_channel_intention;
+	info.mask_1_red_channel_intention = si->mask_1_red_channel_intention;
+	info.mask_1_green_channel_intention = si->mask_1_green_channel_intention;
+	info.mask_1_blue_channel_intention = si->mask_1_blue_channel_intention;
+	info.styleGlobalId = si->material_style.globalId;
+	switch(si->enum_Number_of_Supported_Layers_For_Material_Shader){
+	case NUMBER_OF_SUPPORTED_LAYERS_FOR_MATERIAL_SHADER_SUPPORTS1LAYER:
+		info.numSupportedLayers = 1;
+		break;
+	case NUMBER_OF_SUPPORTED_LAYERS_FOR_MATERIAL_SHADER_SUPPORTS4LAYERS:
+		info.numSupportedLayers = 4;
+		break;
+	case NUMBER_OF_SUPPORTED_LAYERS_FOR_MATERIAL_SHADER_SUPPORTS7LAYERS:
+		info.numSupportedLayers = 7;
+		break;
+	case NUMBER_OF_SUPPORTED_LAYERS_FOR_MATERIAL_SHADER_SUPPORTS0LAYERS:
+		info.numSupportedLayers = 0;
+		break;
+	default:
+		info.numSupportedLayers = -1;
+	}
+
+	return info;
+}
+
 uint32_t mat_Handle::getShaderGlobalId(){
 	mat_* str = (mat_*)root;
 	return str->material_shader.globalId;
